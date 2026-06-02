@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Zenova – Chapter 1: Dusk</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#f0f2f8;color:#1e1e2e}
+.app{display:flex;flex-direction:column;min-height:100vh}
+.mobile-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;border-bottom:1px solid #e4e7f0;position:sticky;top:0;z-index:100}
+.logo-wrap{display:flex;align-items:center;gap:9px}
+.logo-text{font-size:20px;font-weight:800;color:#0f2166;letter-spacing:-0.5px}
+.header-icons{display:flex;align-items:center;gap:10px}
+.icon-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%}
+.avatar{width:36px;height:36px;border-radius:50%;background:#dde3f5;display:flex;align-items:center;justify-content:center}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;color:#0f2166;padding:6px 0}
+.sidebar{display:none}
+.main{flex:1;display:flex;flex-direction:column}
+.content{flex:1;padding:18px 16px 100px;display:flex;flex-direction:column;gap:0;overflow-y:auto}
+.ch-hero{background:linear-gradient(135deg,#0f2166 0%,#1e3a9f 60%,#2d4fc7 100%);border-radius:18px;padding:26px 22px 22px;position:relative;overflow:hidden;margin-bottom:18px;display:flex;flex-direction:column;flex-shrink:0}
+.ch-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+.hero-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:99px;padding:4px 12px;font-size:11.5px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:12px;position:relative;z-index:2;align-self:flex-start}
+.hero-chnum{font-size:12.5px;font-weight:700;color:#f59e0b;position:relative;z-index:2;margin-bottom:4px}
+.hero-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:800;color:#fff;line-height:1.15;position:relative;z-index:2;margin-bottom:8px}
+.hero-sub{font-size:12px;color:rgba(255,255,255,.7);position:relative;z-index:2;line-height:1.5;margin-bottom:16px}
+.hero-stats{display:flex;gap:14px;position:relative;z-index:2;flex-wrap:wrap}
+.hero-stat{background:rgba(255,255,255,.1);border-radius:9px;padding:8px 14px;text-align:center}
+.hero-stat-num{font-size:16px;font-weight:800;color:#fff;line-height:1}
+.hero-stat-lbl{font-size:10px;color:rgba(255,255,255,.65);margin-top:2px}
+.tab-nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:18px;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;background:#fff;border:1.5px solid #e4e7f0;border-radius:99px;padding:7px 15px;font-size:12.5px;font-weight:600;color:#6b7280;cursor:pointer;font-family:'Inter',sans-serif;transition:all .18s;white-space:nowrap}
+.tab-btn.active{background:#0f2166;border-color:#0f2166;color:#fff}
+.section{display:none;flex-direction:column;gap:14px;animation:fadeIn .25s ease}
+.section.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card{background:#fff;border-radius:14px;border:1px solid #e4e7f0;padding:18px}
+.card-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.card-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.card-icon.blue{background:#e0e7ff}
+.card-icon.gold{background:#fef9c3}
+.card-icon.green{background:#dcfce7}
+.card-icon.purple{background:#ede9fe}
+.card-icon.teal{background:#ccfbf1}
+.card-title{font-size:14.5px;font-weight:800;color:#0f2166}
+.summary-text{font-size:13.5px;color:#374151;line-height:1.75}
+.summary-text p{margin-bottom:10px}
+.summary-text p:last-child{margin-bottom:0}
+.one-line{background:linear-gradient(135deg,#fef9c3,#fffbeb);border:1.5px solid #fde68a;border-radius:12px;padding:14px 16px;font-size:13.5px;font-weight:600;color:#92400e;line-height:1.6;font-style:italic}
+.audio-card{background:#fff;border-radius:14px;border:1px solid #e4e7f0;padding:18px;display:flex;flex-direction:column;gap:14px}
+.audio-track{background:#f8f9fd;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;border:1px solid #edf0f8}
+.audio-track-top{display:flex;align-items:center;gap:12px}
+.play-btn{width:42px;height:42px;border-radius:50%;background:#0f2166;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s,opacity .15s}
+.play-btn:hover{opacity:.85}
+.play-btn.playing{background:#ef4444}
+.audio-info{flex:1;min-width:0}
+.audio-title{font-size:13px;font-weight:700;color:#0f2166;margin-bottom:2px}
+.audio-meta{font-size:11.5px;color:#9ca3af}
+.audio-dur{font-size:12.5px;font-weight:600;color:#6b7280;flex-shrink:0}
+.audio-bar-wrap{display:flex;align-items:center;gap:10px}
+.audio-time{font-size:11px;color:#9ca3af;flex-shrink:0;width:32px}
+.audio-bar-bg{flex:1;background:#e8eaf2;border-radius:99px;height:5px;cursor:pointer;position:relative;overflow:hidden}
+.audio-bar-fill{height:100%;background:#0f2166;border-radius:99px;width:0%;transition:width .3s linear;pointer-events:none}
+.cast-item{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid #f3f4f8}
+.cast-item:last-child{border-bottom:none;padding-bottom:0}
+.cast-avatar{width:38px;height:38px;border-radius:10px;background:#dde3f5;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cast-name{font-size:13px;font-weight:700;color:#0f2166;margin-bottom:2px}
+.cast-role{font-size:11.5px;color:#6b7280;line-height:1.4}
+.kp-item{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid #f3f4f8}
+.kp-item:last-child{border-bottom:none;padding-bottom:0}
+.kp-num{width:26px;height:26px;border-radius:7px;background:#0f2166;color:#fff;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.kp-body{flex:1}
+.kp-title{font-size:13px;font-weight:700;color:#0f2166;margin-bottom:4px}
+.kp-desc{font-size:12px;color:#6b7280;line-height:1.55}
+.q-item{border-radius:11px;border:1px solid #e4e7f0;overflow:hidden;margin-bottom:10px}
+.q-item:last-child{margin-bottom:0}
+.q-head{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;cursor:pointer;gap:10px;background:#fff}
+.q-num{width:22px;height:22px;border-radius:6px;background:#e0e7ff;color:#0f2166;font-size:10.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.q-text{font-size:13px;font-weight:600;color:#374151;flex:1;line-height:1.45}
+.q-arrow{color:#9ca3af;transition:transform .2s;flex-shrink:0}
+.q-item.open .q-arrow{transform:rotate(180deg)}
+.q-answer{display:none;padding:0 15px 13px;font-size:13px;color:#16a34a;font-weight:600;line-height:1.55;background:#fff;border-top:1px solid #f3f4f8}
+.q-item.open .q-answer{display:block}
+.q-answer-label{font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.theme-pill{background:#f0f2f8;border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:9px}
+.theme-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.theme-text{font-size:12.5px;font-weight:600;color:#374151}
+.read-progress-bar{height:3px;background:#e8eaf2;position:sticky;top:64px;z-index:99;overflow:hidden}
+.read-progress-fill{height:100%;background:#0f2166;width:0%;transition:width .1s}
+.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e4e7f0;padding:10px 0 18px;z-index:100}
+.mnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:10.5px;color:#9ca3af;font-weight:500;padding:4px 0}
+.mnav-btn.active{color:#0f2166;font-weight:700}
+.desktop-topbar{display:none}
+@media(min-width:768px){
+  .app{flex-direction:row;height:100vh;overflow:hidden}
+  .mobile-header{display:none}
+  .mobile-nav{display:none}
+  .sidebar{display:flex;flex-direction:column;width:230px;background:#fff;border-right:1px solid #e4e7f0;height:100vh;flex-shrink:0}
+  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f2f8}
+  .sb-nav{padding:12px 10px;flex:1;overflow-y:auto}
+  .sb-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 13px;border-radius:9px;border:none;cursor:pointer;font-size:13.5px;font-family:'Inter',sans-serif;font-weight:500;color:#6b7280;background:transparent;margin-bottom:2px;text-align:left;transition:background .15s,color .15s}
+  .sb-btn:hover{background:#f5f6fb;color:#0f2166}
+  .sb-btn.active{background:#0f2166;color:#fff;font-weight:700}
+  .sb-premium{margin:12px;border-radius:14px;background:linear-gradient(145deg,#0f2166,#1e3a9f);padding:16px 15px;color:#fff}
+  .sb-premium h4{font-size:14px;font-weight:700;margin-bottom:6px}
+  .sb-premium p{font-size:11.5px;opacity:.82;line-height:1.55;margin-bottom:12px}
+  .desktop-topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 28px;background:#fff;border-bottom:1px solid #e4e7f0;flex-shrink:0}
+  .main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .read-progress-bar{top:57px}
+  .content{padding:24px 28px 28px;overflow-y:auto;overflow-x:hidden;flex:1;min-height:0;display:flex;flex-direction:column;gap:0}
+  .ch-hero{padding:32px 32px 28px;margin-bottom:22px;flex-shrink:0}
+  .hero-title{font-size:34px}
+  .tab-nav{display:flex;flex-shrink:0;margin-bottom:18px}
+  .section{flex-shrink:0}
+  .section.active{display:flex;flex-direction:column;gap:14px}
+  .theme-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="mobile-header">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="back-btn" onclick="history.back()"><svg width="18" height="18" fill="none" stroke="#0f2166" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button>
+    <div class="logo-wrap">
+      <svg width="28" height="28" viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="87" stroke="#0f2166" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="462 92" stroke-dashoffset="46"/><polygon points="50,57 150,57 150,73 76,127 150,127 150,143 50,143 50,127 124,73 50,73" fill="#0f2166"/></svg>
+      <span class="logo-text">Zenova</span>
+    </div>
+  </div>
+  <div class="header-icons">
+    <button class="icon-btn"><svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+    <div class="avatar" onclick="location.href='settings.html'" style="cursor:pointer"><svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+  </div>
+</header>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="36" height="36" viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="87" stroke="#0f2166" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="462 92" stroke-dashoffset="46"/><polygon points="50,57 150,57 150,73 76,127 150,127 150,143 50,143 50,127 124,73 50,73" fill="#0f2166"/></svg>
+    <span class="logo-text">Zenova</span>
+  </div>
+  <nav class="sb-nav">
+    <button class="sb-btn" onclick="location.href='dashboard.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9.75L12 3l9 6.75V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path d="M9 21V12h6v9"/></svg>Home</button>
+    <button class="sb-btn active" onclick="location.href='chapters.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Chapters</button>
+    <button class="sb-btn" onclick="location.href='practice_question.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>Audio Summaries</button>
+    <button class="sb-btn" onclick="location.href='test1.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>Practice Quizzes</button>
+    <button class="sb-btn" onclick="location.href='chapters.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Cast &amp; Characters</button>
+    <button class="sb-btn" onclick="location.href='notes.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Notes</button>
+  </nav>
+  <div class="sb-premium">
+    <h4>&#x1F451; Unlock Premium</h4>
+    <p>Access all summaries, audios, quizzes, character analysis and revision materials.</p>
+    <button style="width:100%;padding:9px 0;background:#f59e0b;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;color:#7c2d12;cursor:pointer">Upgrade Now</button>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="desktop-topbar">
+    <button class="back-btn" onclick="history.back()"><svg width="17" height="17" fill="none" stroke="#0f2166" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Back to Chapters</button>
+    <div class="header-icons">
+      <button class="icon-btn"><svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+      <div class="avatar" onclick="location.href='settings.html'" style="cursor:pointer"><svg width="18" height="18" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+    </div>
+  </header>
+
+  <div class="read-progress-bar"><div class="read-progress-fill" id="readBar"></div></div>
+
+  <div class="content" id="mainContent">
+
+    <div class="ch-hero">
+      <div class="hero-pill">&#x1F4DA; The Lekki Headmaster</div>
+      <div class="hero-chnum">CHAPTER 1</div>
+      <h1 class="hero-title">Dusk</h1>
+      <p class="hero-sub">A respected principal breaks down in tears during morning assembly — and no one knows why.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">~8</div><div class="hero-stat-lbl">Min Read</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">7</div><div class="hero-stat-lbl">CBT Questions</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-lbl">Key Themes</div></div>
+      </div>
+    </div>
+
+    <div class="tab-nav">
+      <button class="tab-btn active" data-tab="summary">&#x1F4DD; Summary</button>
+      <button class="tab-btn" data-tab="audio">&#x1F3A7; Audio</button>
+      <button class="tab-btn" data-tab="cast">&#x1F3AD; Cast</button>
+      <button class="tab-btn" data-tab="keypoints">&#x2B50; Key Points</button>
+      <button class="tab-btn" data-tab="cbt">&#x1F3AF; CBT / JAMB</button>
+      <button class="tab-btn" data-tab="themes">&#x1F4CC; Themes</button>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="section active" id="tab-summary">
+      <div class="card">
+        <div class="card-head"><div class="card-icon blue">&#x1F4DD;</div><div class="card-title">Detailed Chapter Summary</div></div>
+        <div class="summary-text">
+          <p>The chapter opens dramatically at the morning assembly of <strong>Stardom Schools</strong>. The principal, <strong>Mr. Bepo</strong>, walks unusually slowly toward the podium — immediately catching the attention of students and teachers.</p>
+          <p>When he takes the microphone, he cannot speak. Instead, he <strong>bursts into tears</strong> before the entire school. Students are shocked because Mr. Bepo is known as a strong, respected, and cheerful leader.</p>
+          <p>The Vice Principal, <strong>Mrs. Grace Apeh</strong>, tries to find out what is wrong, but Mr. Bepo remains silent. She then asks <strong>Mr. Justus Anabel</strong>, the Chemistry teacher, to end the assembly and send students back to class.</p>
+          <p>After the students leave, staff escort Mr. Bepo to his office. Despite numerous attempts by teachers and the school nurse to comfort him, he continues crying for more than <strong>thirty minutes</strong> without explaining why.</p>
+          <p>As news spreads, worried parents begin calling the school. The Vice Principal eventually contacts the <strong>Managing Director (MD), Mrs. Ibidun Gloss</strong>, who is attending an event outside school.</p>
+          <p>Interestingly, the day had started positively. The school had <strong>reduced boarding fees from &#x20A6;250,000 to &#x20A6;165,000</strong>, improving punctuality significantly. Before the breakdown, an SSS1 student <strong>Ikenna Egbu</strong> had delivered an inspiring speech about an excursion to Jos — receiving loud applause.</p>
+          <p>Mr. Bepo is respected for his <strong>24 years of dedicated service</strong>. His humorous imitation of characters from the TV drama <em>Village Headmaster</em> earned him the nickname <strong>"The Lekki Headmaster."</strong></p>
+          <p><strong>Mrs. Ibidun Gloss</strong> returns quickly. She is especially surprised because the previous day had been a celebration — the school achieved a <strong>90% WASSCE success rate</strong> and teachers received bonuses. She asks <strong>Mr. Ope Wande</strong>, a Physics teacher and pastor, to counsel Mr. Bepo — without success.</p>
+          <p>The chapter ends with the mystery <strong>unresolved</strong>, leaving readers eager to discover what caused Mr. Bepo's breakdown.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-icon gold">&#x1F4A1;</div><div class="card-title">One-Line Chapter Summary</div></div>
+        <div class="one-line">"Chapter 1 introduces the shocking emotional collapse of the respected principal, Mr. Bepo, during assembly, creating a mystery that leaves the entire school searching for answers."</div>
+      </div>
+    </div>
+
+    <!-- AUDIO -->
+    <div class="section" id="tab-audio">
+      <div class="audio-card">
+        <div class="card-head"><div class="card-icon purple">&#x1F3A7;</div><div class="card-title">Audio Summary — Chapter 1: Dusk</div></div>
+        <div class="audio-track">
+          <div class="audio-track-top">
+            <button class="play-btn" onclick="togglePlay(0)" id="playBtn0"><svg id="playIcon0" width="16" height="16" fill="white" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></button>
+            <div class="audio-info"><div class="audio-title">Chapter 1 Summary</div><div class="audio-meta">Full chapter audio summary</div></div>
+            <div class="audio-dur" id="dur0">--:--</div>
+          </div>
+          <div class="audio-bar-wrap">
+            <span class="audio-time" id="curTime0">0:00</span>
+            <div class="audio-bar-bg" onclick="seekAudio(0,event)" id="barBg0"><div class="audio-bar-fill" id="barFill0"></div></div>
+            <span class="audio-time" id="totalTime0">--:--</span>
+          </div>
+          <audio id="audio0" src="3.mp3" preload="metadata"></audio>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAST -->
+    <div class="section" id="tab-cast">
+      <div class="card">
+        <div class="card-head"><div class="card-icon purple">&#x1F3AD;</div><div class="card-title">Major Characters & Cast</div></div>
+        <div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F468;&#x200D;&#x1F3EB;</div><div><div class="cast-name">Mr. Bepo</div><div class="cast-role">Principal of Stardom Schools — respected leader known as "The Lekki Headmaster" with 24 years of dedicated service</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F469;&#x200D;&#x1F4BC;</div><div><div class="cast-name">Mrs. Grace Apeh</div><div class="cast-role">Vice Principal — took charge during the assembly crisis and managed the situation calmly and professionally</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F469;&#x200D;&#x1F4BC;</div><div><div class="cast-name">Mrs. Ibidun Gloss</div><div class="cast-role">Managing Director (MD) of Stardom Schools — returned immediately after hearing about Mr. Bepo's breakdown</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F9EA;</div><div><div class="cast-name">Mr. Justus Anabel</div><div class="cast-role">Chemistry teacher — instructed by the VP to dismiss the assembly after the incident</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F3A8;</div><div><div class="cast-name">Mr. Audu</div><div class="cast-role">Fine Arts teacher — openly criticized the MD's financial decisions, especially the increase in excursion fees</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F393;</div><div><div class="cast-name">Ikenna Egbu</div><div class="cast-role">SSS1 student — delivered an inspiring speech about the excursion to Jos that received loud applause before the crisis</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x26EA;</div><div><div class="cast-name">Mr. Ope Wande</div><div class="cast-role">Physics teacher and pastor — asked by the MD to counsel Mr. Bepo, but unable to uncover the reason for his tears</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F469;</div><div><div class="cast-name">Mrs. Bepo</div><div class="cast-role">Mr. Bepo's wife — the school attempted to reach her via international phone number, but all attempts failed</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F9EA;</div><div><div class="cast-name">Mr. Obong Ukake</div><div class="cast-role">Chemistry teacher — reprimanded for students' poor academic results in his subject</div></div></div>
+          <div class="cast-item"><div class="cast-avatar">&#x1F30D;</div><div><div class="cast-name">Miss Taye Kareem</div><div class="cast-role">Geography teacher — reprimanded alongside Mr. Ukake for students' poor performance</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KEY POINTS -->
+    <div class="section" id="tab-keypoints">
+      <div class="card">
+        <div class="card-head"><div class="card-icon gold">&#x2B50;</div><div class="card-title">Key Points</div></div>
+        <div>
+          <div class="kp-item"><div class="kp-num">1</div><div class="kp-body"><div class="kp-title">Mr. Bepo's Emotional Breakdown</div><div class="kp-desc">The principal unexpectedly cries during assembly and refuses to explain the reason — shocking the entire school community.</div></div></div>
+          <div class="kp-item"><div class="kp-num">2</div><div class="kp-body"><div class="kp-title">Mystery Introduced</div><div class="kp-desc">Readers are left wondering what caused his distress. This becomes the chapter's central suspense and narrative hook.</div></div></div>
+          <div class="kp-item"><div class="kp-num">3</div><div class="kp-body"><div class="kp-title">School Environment</div><div class="kp-desc">Stardom Schools is portrayed as disciplined and achievement-oriented. Academic excellence is highly valued by the management.</div></div></div>
+          <div class="kp-item"><div class="kp-num">4</div><div class="kp-body"><div class="kp-title">Leadership and Concern</div><div class="kp-desc">Teachers and management show genuine concern for Mr. Bepo, demonstrating a culture of care within the institution.</div></div></div>
+          <div class="kp-item"><div class="kp-num">5</div><div class="kp-body"><div class="kp-title">Importance of Reputation</div><div class="kp-desc">The MD worries about how the incident may affect the school's image and public standing in the community.</div></div></div>
+          <div class="kp-item"><div class="kp-num">6</div><div class="kp-body"><div class="kp-title">Reward and Accountability</div><div class="kp-desc">Teachers are rewarded for success (90% WASSCE pass rate) and criticized for poor performance — showing balanced management.</div></div></div>
+          <div class="kp-item"><div class="kp-num">7</div><div class="kp-body"><div class="kp-title">The Lekki Headmaster's Reputation</div><div class="kp-desc">Mr. Bepo is respected for 24 years of dedication, leadership, and humor — making his breakdown all the more alarming.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CBT/JAMB -->
+    <div class="section" id="tab-cbt">
+      <div class="card">
+        <div class="card-head"><div class="card-icon green">&#x1F3AF;</div><div class="card-title">Possible CBT / JAMB Questions</div></div>
+        <div>
+          <div class="q-item" onclick="toggleQ(this)"><div class="q-head"><span class="q-num">1</span><span class="q-text">Why was Mr. Bepo called "The Lekki Headmaster"?</span><span class="q-arrow"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="q-answer"><div class="q-answer-label">&#x2705; Answer</div>Because of his humorous imitation of characters from the television drama <em>Village Headmaster</em>.</div></div>
+          <div class="q-item" onclick="toggleQ(this)"><div class="q-head"><span class="q-num">2</span><span class="q-text">Who ended the assembly after Mr. Bepo broke down?</span><span class="q-arrow"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="q-answer"><div class="q-answer-label">&#x2705; Answer</div>Mr. Justus Anabel (Chemistry teacher), on the instruction of Mrs. Grace Apeh.</div></div>
+          <div class="q-item" onclick="toggleQ(this)"><div class="q-head"><span class="q-num">3</span><span class="q-text">Who was the Vice Principal of Stardom Schools?</span><span class="q-arrow"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="q-answer"><div class="q-answer-label">&#x2705; Answer</div>Mrs. Grace Apeh.</div></div>
+          <div class="q-item" onclick="toggleQ(this)"><div class="q-head"><span class="q-num">4</span><span class="q-text">What percentage success rate did the school record in WASSCE?</span><span class="q-arrow"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="q-answer"><div class="q-answer-label">&#x2705; Answer</div>90% success rate.</div></div>
+          <div class="q-item" onclick="toggleQ(this)"><div class="q-head"><span class="q-num">5</span><span class="q-text">Which student delivered the speech about Jos?</span><span class="q-arrow"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="q-answer"><div class="q-answer-label">&#x2705; Answer</div>Ikenna Egbu, an SSS1 student.</div></div>
+          <div class="q-item" onclick="toggleQ(this)"><div class="q-head"><span class="q-num">6</span><span class="q-text">Why did the MD return to school immediately?</span><span class="q-arrow"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="q-answer"><div class="q-answer-label">&#x2705; Answer</div>Because she was informed about Mr. Bepo's emotional breakdown during morning assembly.</div></div>
+          <div class="q-item" onclick="toggleQ(this)"><div class="q-head"><span class="q-num">7</span><span class="q-text">What was reduced from &#x20A6;250,000 to &#x20A6;165,000?</span><span class="q-arrow"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></div><div class="q-answer"><div class="q-answer-label">&#x2705; Answer</div>The boarding fees for students.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THEMES -->
+    <div class="section" id="tab-themes">
+      <div class="card">
+        <div class="card-head"><div class="card-icon teal">&#x1F4CC;</div><div class="card-title">Chapter Themes</div></div>
+        <div class="theme-grid">
+          <div class="theme-pill"><div class="theme-dot" style="background:#6366f1"></div><div class="theme-text">Mystery &amp; Suspense</div></div>
+          <div class="theme-pill"><div class="theme-dot" style="background:#0f2166"></div><div class="theme-text">Leadership &amp; Responsibility</div></div>
+          <div class="theme-pill"><div class="theme-dot" style="background:#f59e0b"></div><div class="theme-text">School Administration</div></div>
+          <div class="theme-pill"><div class="theme-dot" style="background:#ef4444"></div><div class="theme-text">Emotional Struggles</div></div>
+          <div class="theme-pill"><div class="theme-dot" style="background:#10b981"></div><div class="theme-text">Reputation &amp; Public Image</div></div>
+          <div class="theme-pill"><div class="theme-dot" style="background:#8b5cf6"></div><div class="theme-text">Academic Excellence</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-icon gold">&#x1F4A1;</div><div class="card-title">One-Line Chapter Summary</div></div>
+        <div class="one-line">"Chapter 1 introduces the shocking emotional collapse of the respected principal, Mr. Bepo, during assembly, creating a mystery that leaves the entire school searching for answers."</div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<nav class="mobile-nav">
+  <button class="mnav-btn" onclick="location.href='dashboard.html'"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9.75L12 3l9 6.75V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path d="M9 21V12h6v9"/></svg>Home</button>
+  <button class="mnav-btn active" onclick="location.href='chapters.html'"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Chapters</button>
+  <button class="mnav-btn" onclick="location.href='practice_question.html'"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>Audio</button>
+  <button class="mnav-btn" onclick="location.href='test1.html'"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>Quiz</button>
+  <button class="mnav-btn" onclick="setMnav(this)"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+</nav>
+
+</div>
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const tab=btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+tab).classList.add('active');
+    btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  });
+});
+function toggleQ(item){
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.q-item').forEach(q=>q.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+const audioEls=[document.getElementById('audio0')];
+function fmt(s){if(isNaN(s))return'--:--';const m=Math.floor(s/60),sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+audioEls.forEach((audio,i)=>{
+  audio.addEventListener('loadedmetadata',()=>{document.getElementById('dur'+i).textContent=fmt(audio.duration);document.getElementById('totalTime'+i).textContent=fmt(audio.duration);});
+  audio.addEventListener('timeupdate',()=>{const pct=audio.duration?(audio.currentTime/audio.duration)*100:0;document.getElementById('barFill'+i).style.width=pct+'%';document.getElementById('curTime'+i).textContent=fmt(audio.currentTime);});
+  audio.addEventListener('ended',()=>setPlayIcon(i,false));
+});
+function setPlayIcon(i,playing){
+  const btn=document.getElementById('playBtn'+i),icon=document.getElementById('playIcon'+i);
+  if(playing){btn.classList.add('playing');icon.innerHTML='<rect x="6" y="4" width="4" height="16" fill="white"/><rect x="14" y="4" width="4" height="16" fill="white"/>';}
+  else{btn.classList.remove('playing');icon.innerHTML='<polygon points="5 3 19 12 5 21 5 3" fill="white"/>';}
+}
+function togglePlay(i){
+  const audio=audioEls[i],isPlaying=!audio.paused;
+  audioEls.forEach((a,idx)=>{if(idx!==i){a.pause();setPlayIcon(idx,false);}});
+  if(isPlaying){audio.pause();setPlayIcon(i,false);}
+  else{audio.play().catch(()=>{});setPlayIcon(i,true);}
+}
+function seekAudio(i,e){
+  const audio=audioEls[i],bar=document.getElementById('barBg'+i),rect=bar.getBoundingClientRect();
+  const pct=Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+  if(audio.duration)audio.currentTime=pct*audio.duration;
+}
+const content=document.getElementById('mainContent'),readBar=document.getElementById('readBar');
+content.addEventListener('scroll',()=>{
+  const{scrollTop,scrollHeight,clientHeight}=content;
+  readBar.style.width=(scrollHeight-clientHeight>0?(scrollTop/(scrollHeight-clientHeight))*100:0)+'%';
+});
+function setSb(btn){document.querySelectorAll('.sb-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active');}
+function setMnav(btn){document.querySelectorAll('.mnav-btn').forEach(x=>x.classList.remove('active'));btn.classList.add('active');}
+</script>
+</body>
+</html>

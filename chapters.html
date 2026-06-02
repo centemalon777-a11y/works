@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Zenova – Chapters</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#f0f2f8;color:#1e1e2e}
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── Mobile Header ── */
+.mobile-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;border-bottom:1px solid #e4e7f0;position:sticky;top:0;z-index:100}
+.logo-wrap{display:flex;align-items:center;gap:9px}
+.logo-text{font-size:20px;font-weight:800;color:#0f2166;letter-spacing:-0.5px}
+.header-icons{display:flex;align-items:center;gap:10px}
+.icon-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%}
+.avatar{width:36px;height:36px;border-radius:50%;background:#dde3f5;display:flex;align-items:center;justify-content:center}
+
+/* ── Sidebar (hidden on mobile) ── */
+.sidebar{display:none}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column}
+
+/* ── Content ── */
+.content{flex:1;padding:18px 16px 100px;display:flex;flex-direction:column;gap:16px}
+
+/* ── Page Header ── */
+.page-header{display:flex;flex-direction:column;gap:4px}
+.page-title{font-size:22px;font-weight:800;color:#0f2166;letter-spacing:-0.5px}
+.page-sub{font-size:13px;color:#9ca3af;font-weight:500}
+
+/* ── Progress Strip ── */
+.progress-strip{background:#fff;border-radius:14px;border:1px solid #e4e7f0;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.strip-icon{width:42px;height:42px;border-radius:11px;background:#e0e7ff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.strip-body{flex:1;min-width:0}
+.strip-label{font-size:12px;color:#6b7280;font-weight:500;margin-bottom:5px}
+.strip-bar-bg{background:#e8eaf2;border-radius:99px;height:8px;overflow:hidden;margin-bottom:4px}
+.strip-bar-fill{width:8.33%;background:linear-gradient(90deg,#0f2166,#1e3a9f);height:100%;border-radius:99px;transition:width 1s ease}
+.strip-count{font-size:11.5px;color:#9ca3af}
+.strip-pct{font-size:18px;font-weight:800;color:#0f2166;flex-shrink:0}
+
+/* ── Section Label ── */
+.section-label{font-size:12px;font-weight:700;color:#9ca3af;letter-spacing:0.06em;text-transform:uppercase;padding:4px 0 2px}
+
+/* ── Chapter Card ── */
+.chapter-list{display:flex;flex-direction:column;gap:10px}
+
+.chapter-card{background:#fff;border-radius:14px;border:1px solid #e4e7f0;padding:15px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:transform .18s,box-shadow .18s;text-decoration:none;color:inherit;position:relative;overflow:hidden}
+.chapter-card:active{transform:scale(.98)}
+.chapter-card.unlocked:hover{box-shadow:0 4px 20px rgba(15,33,102,.1);transform:translateY(-1px)}
+.chapter-card.locked{cursor:default;opacity:.72}
+
+/* Subtle left accent for unlocked */
+.chapter-card.unlocked::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#0f2166,#1e3a9f);border-radius:14px 0 0 14px}
+
+/* Number badge */
+.ch-num{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;flex-shrink:0;transition:background .2s}
+.chapter-card.unlocked .ch-num{background:#e0e7ff;color:#0f2166}
+.chapter-card.locked .ch-num{background:#f3f4f6;color:#d1d5db}
+
+/* Text */
+.ch-body{flex:1;min-width:0}
+.ch-title{font-size:13.5px;font-weight:700;color:#0f2166;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.chapter-card.locked .ch-title{color:#9ca3af}
+.ch-sub{font-size:11.5px;color:#9ca3af}
+
+/* Right side */
+.ch-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.ch-badge{font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:7px}
+.badge-open{background:#dcfce7;color:#16a34a}
+.badge-lock{background:#f3f4f6;color:#9ca3af;display:flex;align-items:center;gap:4px}
+.ch-meta{font-size:11px;color:#c4c9d8}
+
+/* ── Unlock Banner ── */
+.unlock-banner{background:linear-gradient(135deg,#0f2166 0%,#1e3a9f 100%);border-radius:16px;padding:20px 20px;display:flex;align-items:center;gap:16px;position:relative;overflow:hidden}
+.unlock-banner::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+.banner-icon{font-size:32px;position:relative;z-index:1;flex-shrink:0}
+.banner-body{flex:1;position:relative;z-index:1}
+.banner-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:4px}
+.banner-sub{font-size:12px;color:rgba(255,255,255,.75);line-height:1.5;margin-bottom:12px}
+.banner-btn{display:inline-flex;align-items:center;gap:7px;background:#f59e0b;color:#7c2d12;border:none;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap;transition:opacity .2s}
+.banner-btn:hover{opacity:.9}
+
+/* ── Locked overlay tap feedback ── */
+.lock-tap-msg{display:none;position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e1e2e;color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:99px;z-index:200;white-space:nowrap;pointer-events:none;animation:fadeUp .3s ease}
+.lock-tap-msg.show{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* ── Mobile Nav ── */
+.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e4e7f0;padding:10px 0 18px;z-index:100}
+.mnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:10.5px;color:#9ca3af;font-weight:500;padding:4px 0}
+.mnav-btn.active{color:#0f2166;font-weight:700}
+
+/* Desktop topbar hidden on mobile */
+.desktop-topbar{display:none}
+
+/* ── Desktop Overrides ── */
+@media(min-width:768px){
+  .app{flex-direction:row;height:100vh;overflow:hidden}
+  .mobile-header{display:none}
+  .mobile-nav{display:none}
+
+  .sidebar{display:flex;flex-direction:column;width:230px;background:#fff;border-right:1px solid #e4e7f0;height:100vh;flex-shrink:0}
+  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f2f8}
+  .sb-nav{padding:12px 10px;flex:1;overflow-y:auto}
+  .sb-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 13px;border-radius:9px;border:none;cursor:pointer;font-size:13.5px;font-family:'Inter',sans-serif;font-weight:500;color:#6b7280;background:transparent;margin-bottom:2px;text-align:left;transition:background .15s,color .15s}
+  .sb-btn:hover{background:#f5f6fb;color:#0f2166}
+  .sb-btn.active{background:#0f2166;color:#fff;font-weight:700}
+  .sb-premium{margin:12px;border-radius:14px;background:linear-gradient(145deg,#0f2166,#1e3a9f);padding:16px 15px;color:#fff}
+  .sb-premium h4{font-size:14px;font-weight:700;margin-bottom:6px}
+  .sb-premium p{font-size:11.5px;opacity:.82;line-height:1.55;margin-bottom:12px}
+
+  .desktop-topbar{display:flex;align-items:center;justify-content:flex-end;padding:13px 28px;background:#fff;border-bottom:1px solid #e4e7f0;flex-shrink:0}
+
+  .main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .content{padding:24px 28px 28px;gap:20px;overflow-y:auto;flex:1;display:block}
+  .content > *{margin-bottom:20px}
+  .content > *:last-child{margin-bottom:0}
+
+  /* 2-column chapter grid on desktop */
+  .chapter-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+
+  .page-title{font-size:26px}
+  .unlock-banner{max-width:680px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Mobile Header -->
+<header class="mobile-header">
+  <div class="logo-wrap">
+    <svg width="32" height="32" viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="87" stroke="#0f2166" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="462 92" stroke-dashoffset="46"/><polygon points="50,57 150,57 150,73 76,127 150,127 150,143 50,143 50,127 124,73 50,73" fill="#0f2166"/></svg>
+    <span class="logo-text">Zenova</span>
+  </div>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications" onclick="location.href='notifications.html'">
+      <svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+    <div class="avatar" role="img" aria-label="Profile" onclick="location.href='settings.html'" style="cursor:pointer">
+      <svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- Sidebar (Desktop only) -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="36" height="36" viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="87" stroke="#0f2166" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="462 92" stroke-dashoffset="46"/><polygon points="50,57 150,57 150,73 76,127 150,127 150,143 50,143 50,127 124,73 50,73" fill="#0f2166"/></svg>
+    <span class="logo-text">Zenova</span>
+  </div>
+  <nav class="sb-nav">
+    <button class="sb-btn" onclick="location.href='dashboard.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9.75L12 3l9 6.75V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path d="M9 21V12h6v9"/></svg>Home</button>
+    <button class="sb-btn active" onclick="location.href='chapters.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Chapters</button>
+    <button class="sb-btn" onclick="location.href='practice_question.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>Audio Summaries</button>
+    <button class="sb-btn" onclick="location.href='test1.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>Practice Quizzes</button>
+    <button class="sb-btn" onclick="location.href='chapters.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Cast &amp; Characters</button>
+    <button class="sb-btn" onclick="location.href='notes.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Notes</button>
+  </nav>
+  <div class="sb-premium">
+    <h4>&#x1F451; Unlock Premium</h4>
+    <p>Access all summaries, audios, quizzes, character analysis and revision materials.</p>
+    <button style="width:100%;padding:9px 0;background:#f59e0b;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;color:#7c2d12;cursor:pointer">Upgrade Now</button>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- Desktop Topbar -->
+  <header class="desktop-topbar">
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Notifications" onclick="location.href='notifications.html'">
+        <svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <div class="avatar" role="img" aria-label="Profile" onclick="location.href='settings.html'" style="cursor:pointer">
+        <svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">&#x1F4DA; Chapters</h1>
+      <p class="page-sub">The Lekki Headmaster · 12 Chapters</p>
+    </div>
+
+    <!-- Progress Strip -->
+    <div class="progress-strip">
+      <div class="strip-icon">&#x1F4D6;</div>
+      <div class="strip-body">
+        <div class="strip-label">Your Reading Progress</div>
+        <div class="strip-bar-bg"><div class="strip-bar-fill" id="stripBar"></div></div>
+        <div class="strip-count">1 of 12 chapters unlocked</div>
+      </div>
+      <div class="strip-pct" id="stripPct">8%</div>
+    </div>
+
+    <!-- Unlock Banner -->
+    <div class="unlock-banner">
+      <div class="banner-icon">&#x1F451;</div>
+      <div class="banner-body">
+        <div class="banner-title">Unlock All 12 Chapters</div>
+        <div class="banner-sub">Get full access to every chapter summary, quiz, and audio guide. Ace your JAMB with ease.</div>
+        <button class="banner-btn">Upgrade to Premium <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Chapters List -->
+    <div class="section-label">All Chapters</div>
+
+    <div class="chapter-list" id="chapterList">
+      <!-- Injected by JS -->
+    </div>
+
+  </div>
+</main>
+
+<!-- Mobile Bottom Nav -->
+<nav class="mobile-nav">
+  <button class="mnav-btn" onclick="location.href='dashboard.html'">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9.75L12 3l9 6.75V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path d="M9 21V12h6v9"/></svg>Home
+  </button>
+  <button class="mnav-btn active" onclick="location.href='chapters.html'">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Chapters
+  </button>
+  <button class="mnav-btn" onclick="location.href='practice_question.html'">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>Audio
+  </button>
+  <button class="mnav-btn" onclick="location.href='test1.html'">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>Quiz
+  </button>
+  <button class="mnav-btn" onclick="setMnav(this)">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+  </button>
+</nav>
+
+<!-- Lock Tap Message -->
+<div class="lock-tap-msg" id="lockMsg">&#x1F512; Upgrade to Premium to unlock</div>
+
+</div>
+
+<script>
+const chapters = [
+  { num: 1,  title: "The New Headmaster",       sub: "Introduction & Setting",          mins: 8,  locked: false },
+  { num: 2,  title: "First Day of Authority",   sub: "Power & Control",                 mins: 7,  locked: true  },
+  { num: 3,  title: "The Troublesome Students", sub: "Conflict Begins",                 mins: 9,  locked: true  },
+  { num: 4,  title: "Rules and Discipline",     sub: "Order vs Rebellion",              mins: 8,  locked: true  },
+  { num: 5,  title: "A Mother's Plea",          sub: "Family & Community",              mins: 7,  locked: true  },
+  { num: 6,  title: "The Conspiracy",           sub: "Hidden Motives Emerge",           mins: 10, locked: true  },
+  { num: 7,  title: "Broken Trust",             sub: "Betrayal & Loyalty",              mins: 8,  locked: true  },
+  { num: 8,  title: "The Storm Breaks",         sub: "Crisis Point",                    mins: 9,  locked: true  },
+  { num: 9,  title: "Voices of the Community",  sub: "Public Opinion & Pressure",       mins: 7,  locked: true  },
+  { num: 10, title: "Reckoning",                sub: "Consequences Unfold",             mins: 10, locked: true  },
+  { num: 11, title: "Redemption or Ruin",       sub: "The Turning Point",               mins: 9,  locked: true  },
+  { num: 12, title: "Legacy of the Headmaster", sub: "Resolution & Themes",             mins: 8,  locked: true  },
+];
+
+const lockIcon = `<svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>`;
+const arrowIcon = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+
+const list = document.getElementById('chapterList');
+
+chapters.forEach(ch => {
+  const card = document.createElement('div');
+  card.className = `chapter-card ${ch.locked ? 'locked' : 'unlocked'}`;
+  card.setAttribute('role', ch.locked ? 'button' : 'link');
+  card.setAttribute('aria-label', `Chapter ${ch.num}: ${ch.title}${ch.locked ? ' – Locked' : ''}`);
+
+  card.innerHTML = `
+    <div class="ch-num">${ch.num}</div>
+    <div class="ch-body">
+      <div class="ch-title">${ch.title}</div>
+      <div class="ch-sub">${ch.sub} &middot; ~${ch.mins} min read</div>
+    </div>
+    <div class="ch-right">
+      ${ch.locked
+        ? `<span class="ch-badge badge-lock">${lockIcon} Locked</span>`
+        : `<span class="ch-badge badge-open">✓ Open</span>`
+      }
+      ${!ch.locked ? `<span class="ch-meta">${arrowIcon}</span>` : ''}
+    </div>
+  `;
+
+  if (ch.locked) {
+    card.addEventListener('click', showLockMsg);
+  } else {
+    card.addEventListener('click', () => {
+      // Navigate or open chapter — placeholder alert for now
+      location.href='chapter1.html';
+    });
+  }
+
+  list.appendChild(card);
+});
+
+/* Lock message toast */
+let lockTimer = null;
+function showLockMsg() {
+  const msg = document.getElementById('lockMsg');
+  msg.classList.remove('show');
+  void msg.offsetWidth; // reflow to restart animation
+  msg.classList.add('show');
+  clearTimeout(lockTimer);
+  lockTimer = setTimeout(() => msg.classList.remove('show'), 2200);
+}
+
+/* Nav helpers */
+function setSb(btn) {
+  document.querySelectorAll('.sb-btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+}
+function setMnav(btn) {
+  document.querySelectorAll('.mnav-btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* Animate progress bar */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('stripBar').style.width = '8.33%';
+  }, 400);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Zenova — Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#f0f2f8;color:#1e1e2e}
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+/* ── Mobile Header ── */
+.mobile-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#fff;border-bottom:1px solid #e4e7f0;position:sticky;top:0;z-index:100}
+.logo-wrap{display:flex;align-items:center;gap:9px}
+.logo-text{font-size:20px;font-weight:800;color:#0f2166;letter-spacing:-0.5px}
+.header-icons{display:flex;align-items:center;gap:10px}
+.icon-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%}
+.avatar{width:36px;height:36px;border-radius:50%;background:#dde3f5;display:flex;align-items:center;justify-content:center}
+
+/* ── Sidebar ── */
+.sidebar{display:none}
+
+/* ── Main ── */
+.main{flex:1;display:flex;flex-direction:column}
+.desktop-topbar{display:none}
+
+/* ── Settings Layout ── */
+.settings-wrap{flex:1;padding:18px 16px 100px;display:flex;flex-direction:column;gap:0}
+
+/* ── Page Header ── */
+.page-header{margin-bottom:20px}
+.page-title{font-size:22px;font-weight:800;color:#0f2166;letter-spacing:-0.3px}
+.page-sub{font-size:13px;color:#9ca3af;margin-top:3px}
+
+/* ── Tab Nav ── */
+.tab-nav{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:20px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tab-nav::-webkit-scrollbar{display:none}
+.tab-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1.5px solid #e4e7f0;background:#fff;font-size:12.5px;font-weight:600;color:#6b7280;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;transition:all .18s;flex-shrink:0}
+.tab-btn:hover{border-color:#0f2166;color:#0f2166}
+.tab-btn.active{background:#0f2166;border-color:#0f2166;color:#fff}
+.tab-btn svg{width:14px;height:14px;flex-shrink:0}
+
+/* ── Section Panels ── */
+.panel{display:none;flex-direction:column;gap:14px;animation:fadeIn .22s ease;flex:1}
+.panel.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Cards ── */
+.card{background:#fff;border-radius:14px;border:1px solid #e4e7f0;padding:18px}
+.card-title{font-size:13px;font-weight:700;color:#0f2166;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.card-title svg{opacity:.6}
+
+/* ── Profile Avatar Area ── */
+.avatar-area{display:flex;align-items:center;gap:14px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid #f3f4f8}
+.profile-avatar{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#0f2166,#1e3a9f);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;flex-shrink:0;position:relative}
+.avatar-badge{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;background:#f59e0b;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center}
+.avatar-info{flex:1;min-width:0}
+.avatar-name{font-size:15px;font-weight:700;color:#0f2166}
+.avatar-email{font-size:12px;color:#9ca3af;margin-top:2px}
+.avatar-change-btn{background:none;border:1.5px solid #e4e7f0;color:#374151;font-size:12px;font-weight:600;padding:6px 12px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0;transition:border-color .15s}
+.avatar-change-btn:hover{border-color:#0f2166;color:#0f2166}
+
+/* ── Form Fields ── */
+.field-group{display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field label{font-size:12px;font-weight:600;color:#374151}
+.field input,.field select,.field textarea{padding:10px 12px;border:1.5px solid #e4e7f0;border-radius:9px;font-size:13px;font-family:'Inter',sans-serif;color:#1e1e2e;background:#fff;outline:none;transition:border-color .15s;width:100%}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#0f2166}
+.field textarea{resize:vertical;min-height:80px;line-height:1.55}
+.field-hint{font-size:11px;color:#9ca3af;margin-top:2px}
+
+/* ── Save Button ── */
+.save-btn{display:inline-flex;align-items:center;gap:7px;background:#0f2166;color:#fff;border:none;border-radius:9px;padding:11px 20px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;transition:opacity .2s;align-self:flex-start}
+.save-btn:hover{opacity:.88}
+.save-btn.gold{background:#f59e0b;color:#7c2d12}
+
+/* ── Toggle Row ── */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #f3f4f8}
+.toggle-row:last-child{border-bottom:none;padding-bottom:0}
+.toggle-row:first-child{padding-top:0}
+.toggle-info{flex:1;min-width:0;padding-right:12px}
+.toggle-label{font-size:13px;font-weight:600;color:#374151}
+.toggle-desc{font-size:11.5px;color:#9ca3af;margin-top:2px;line-height:1.45}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:#e4e7f0;border-radius:99px;cursor:pointer;transition:background .2s}
+.toggle input:checked + .toggle-track{background:#0f2166}
+.toggle-track::after{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle input:checked + .toggle-track::after{transform:translateX(18px)}
+
+/* ── Danger Zone ── */
+.danger-card{background:#fff;border-radius:14px;border:1.5px solid #fee2e2;padding:18px}
+.danger-title{font-size:13px;font-weight:700;color:#dc2626;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.danger-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #fef2f2}
+.danger-row:last-child{border-bottom:none;padding-bottom:0}
+.danger-row:first-child{padding-top:0}
+.danger-info .danger-lbl{font-size:13px;font-weight:600;color:#374151}
+.danger-info .danger-desc{font-size:11.5px;color:#9ca3af;margin-top:2px}
+.danger-btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap;flex-shrink:0;transition:all .15s;border:1.5px solid #fca5a5;background:#fff;color:#dc2626}
+.danger-btn:hover{background:#fee2e2}
+
+/* ── Plan Card in Settings ── */
+.plan-current{background:linear-gradient(135deg,#0f2166 0%,#1e3a9f 100%);border-radius:14px;padding:18px;color:#fff;position:relative;overflow:hidden}
+.plan-current::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+.plan-current-top{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1;margin-bottom:14px}
+.plan-eyebrow{font-size:11px;color:rgba(255,255,255,.65);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+.plan-current-name{font-size:20px;font-weight:800;color:#fff}
+.plan-pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:7px;padding:5px 10px;font-size:11.5px;font-weight:700;color:#fff}
+.plan-current-features{display:flex;flex-direction:column;gap:7px;position:relative;z-index:1;margin-bottom:16px}
+.plan-feat-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:rgba(255,255,255,.85)}
+.plan-feat-item svg{flex-shrink:0;opacity:.7}
+.upgrade-btn{display:inline-flex;align-items:center;gap:7px;background:#f59e0b;color:#7c2d12;border:none;border-radius:9px;padding:10px 18px;font-size:13px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;position:relative;z-index:1;transition:opacity .2s}
+.upgrade-btn:hover{opacity:.9}
+
+/* ── Privacy Section ── */
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid #f3f4f8}
+.info-row:last-child{border-bottom:none;padding-bottom:0}
+.info-row:first-child{padding-top:0}
+.info-lbl{font-size:13px;font-weight:600;color:#374151}
+.info-val{font-size:12.5px;color:#9ca3af}
+.info-link{font-size:12.5px;color:#0f2166;font-weight:600;cursor:pointer;text-decoration:none;background:none;border:none;font-family:'Inter',sans-serif}
+
+/* ── Account Section ── */
+.section-divider{font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.08em;text-transform:uppercase;margin:4px 0 2px;padding-bottom:2px}
+
+/* ── Notification Badge ── */
+.notif-freq{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.freq-chip{padding:5px 11px;border-radius:7px;border:1.5px solid #e4e7f0;font-size:11.5px;font-weight:600;color:#6b7280;cursor:pointer;background:#fff;font-family:'Inter',sans-serif;transition:all .15s}
+.freq-chip.selected{background:#0f2166;border-color:#0f2166;color:#fff}
+
+/* ── Mobile Nav ── */
+.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e4e7f0;padding:10px 0 18px;z-index:100}
+.mnav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:10.5px;color:#9ca3af;font-weight:500;padding:4px 0}
+.mnav-btn.active{color:#0f2166;font-weight:700}
+
+/* ── Saved Toast ── */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:#0f2166;color:#fff;font-size:13px;font-weight:600;padding:10px 20px;border-radius:10px;opacity:0;transition:all .3s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Desktop ── */
+@media(min-width:768px){
+  .app{flex-direction:row;height:100vh;overflow:hidden}
+  .mobile-header{display:none}
+  .mobile-nav{display:none}
+  .toast{bottom:28px}
+
+  .sidebar{display:flex;flex-direction:column;width:230px;background:#fff;border-right:1px solid #e4e7f0;height:100vh;flex-shrink:0}
+  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid #f0f2f8}
+  .sb-nav{padding:12px 10px;flex:1;overflow-y:auto}
+  .sb-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 13px;border-radius:9px;border:none;cursor:pointer;font-size:13.5px;font-family:'Inter',sans-serif;font-weight:500;color:#6b7280;background:transparent;margin-bottom:2px;text-align:left;transition:background .15s,color .15s}
+  .sb-btn:hover{background:#f5f6fb;color:#0f2166}
+  .sb-btn.active{background:#0f2166;color:#fff;font-weight:700}
+  .sb-premium{margin:12px;border-radius:14px;background:linear-gradient(145deg,#0f2166,#1e3a9f);padding:16px 15px;color:#fff}
+  .sb-premium h4{font-size:14px;font-weight:700;margin-bottom:6px}
+  .sb-premium p{font-size:11.5px;opacity:.82;line-height:1.55;margin-bottom:12px}
+
+  .desktop-topbar{display:flex;align-items:center;justify-content:flex-end;padding:13px 28px;background:#fff;border-bottom:1px solid #e4e7f0;flex-shrink:0}
+
+  .main{flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .settings-wrap{padding:24px 28px 28px;overflow-y:auto;flex:1;display:flex;flex-direction:column}
+
+  .tab-nav{display:flex !important;flex-wrap:wrap;overflow:visible;gap:8px;flex-shrink:0}
+  .tab-btn{display:flex !important;padding:8px 16px;font-size:13px}
+
+  .field-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- Mobile Header -->
+<header class="mobile-header">
+  <div class="logo-wrap">
+    <svg width="32" height="32" viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="87" stroke="#0f2166" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="462 92" stroke-dashoffset="46"/><polygon points="50,57 150,57 150,73 76,127 150,127 150,143 50,143 50,127 124,73 50,73" fill="#0f2166"/></svg>
+    <span class="logo-text">Zenova</span>
+  </div>
+  <div class="header-icons">
+    <button class="icon-btn" aria-label="Notifications" onclick="location.href='notifications.html'">
+      <svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+    </button>
+    <div class="avatar" onclick="location.href='settings.html'" style="cursor:pointer">
+      <svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+  </div>
+</header>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="36" height="36" viewBox="0 0 200 200" fill="none"><circle cx="100" cy="100" r="87" stroke="#0f2166" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="462 92" stroke-dashoffset="46"/><polygon points="50,57 150,57 150,73 76,127 150,127 150,143 50,143 50,127 124,73 50,73" fill="#0f2166"/></svg>
+    <span class="logo-text">Zenova</span>
+  </div>
+  <nav class="sb-nav">
+    <button class="sb-btn" onclick="location.href='dashboard.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9.75L12 3l9 6.75V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path d="M9 21V12h6v9"/></svg>Home</button>
+    <button class="sb-btn" onclick="location.href='chapters.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Chapters</button>
+    <button class="sb-btn" onclick="location.href='practice_question.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>Audio Summaries</button>
+    <button class="sb-btn" onclick="location.href='test1.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>Practice Quizzes</button>
+    <button class="sb-btn" onclick="location.href='chapters.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Cast &amp; Characters</button>
+    <button class="sb-btn active" onclick="location.href='settings.html'"><svg width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
+  </nav>
+  <div class="sb-premium">
+    <h4>&#x1F451; Unlock Premium</h4>
+    <p>Access all summaries, audios, quizzes, character analysis and revision materials.</p>
+    <button style="width:100%;padding:9px 0;background:#f59e0b;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;color:#7c2d12;cursor:pointer">Upgrade Now</button>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+  <header class="desktop-topbar">
+    <div class="header-icons">
+      <button class="icon-btn" aria-label="Notifications" onclick="location.href='notifications.html'">
+        <svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      </button>
+      <div class="avatar" onclick="location.href='settings.html'" style="cursor:pointer">
+        <svg width="20" height="20" fill="none" stroke="#6b7280" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <div class="settings-wrap">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1 class="page-title">Settings</h1>
+      <p class="page-sub">Manage your account, preferences and privacy.</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav" role="tablist">
+      <button class="tab-btn active" onclick="switchTab('profile', this)" role="tab">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+      </button>
+      <button class="tab-btn" onclick="switchTab('account', this)" role="tab">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Account
+      </button>
+      <button class="tab-btn" onclick="switchTab('notifications', this)" role="tab">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Notifications
+      </button>
+      <button class="tab-btn" onclick="switchTab('plan', this)" role="tab">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Plan
+      </button>
+      <button class="tab-btn" onclick="switchTab('privacy', this)" role="tab">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Privacy
+      </button>
+    </div>
+
+    <!-- ═══ PROFILE PANEL ═══ -->
+    <div id="panel-profile" class="panel active">
+
+      <div class="card">
+        <div class="avatar-area">
+          <div class="profile-avatar">
+            AO
+            <div class="avatar-badge">
+              <svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+          </div>
+          <div class="avatar-info">
+            <div class="avatar-name">Ade Okonkwo</div>
+            <div class="avatar-email">ade.okonkwo@email.com</div>
+          </div>
+          <button class="avatar-change-btn">Change Photo</button>
+        </div>
+
+        <div class="field-group">
+          <div class="field-row">
+            <div class="field">
+              <label>First Name</label>
+              <input type="text" value="Ade"/>
+            </div>
+            <div class="field">
+              <label>Last Name</label>
+              <input type="text" value="Okonkwo"/>
+            </div>
+          </div>
+          <div class="field">
+            <label>Display Name</label>
+            <input type="text" value="Ade"/>
+            <span class="field-hint">This is how you appear on leaderboards.</span>
+          </div>
+          <div class="field">
+            <label>Bio</label>
+            <textarea>JAMB 2025 candidate. Studying hard for Literature-in-English. Let's go! 📚</textarea>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>School</label>
+              <input type="text" placeholder="Your school name"/>
+            </div>
+            <div class="field">
+              <label>State</label>
+              <select>
+                <option>Lagos</option>
+                <option>Abuja</option>
+                <option>Rivers</option>
+                <option>Ogun</option>
+                <option>Oyo</option>
+                <option>Kano</option>
+              </select>
+            </div>
+          </div>
+          <button class="save-btn" onclick="showToast('Profile saved!')">
+            Save Changes
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ ACCOUNT PANEL ═══ -->
+    <div id="panel-account" class="panel">
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Address
+        </div>
+        <div class="field-group">
+          <div class="field">
+            <label>Current Email</label>
+            <input type="email" value="ade.okonkwo@email.com"/>
+          </div>
+          <div class="field">
+            <label>New Email</label>
+            <input type="email" placeholder="Enter new email address"/>
+          </div>
+          <button class="save-btn" onclick="showToast('Email updated!')">Update Email</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          Password
+        </div>
+        <div class="field-group">
+          <div class="field">
+            <label>Current Password</label>
+            <input type="password" placeholder="••••••••"/>
+          </div>
+          <div class="field">
+            <label>New Password</label>
+            <input type="password" placeholder="Minimum 8 characters"/>
+          </div>
+          <div class="field">
+            <label>Confirm New Password</label>
+            <input type="password" placeholder="Re-enter new password"/>
+          </div>
+          <button class="save-btn" onclick="showToast('Password changed!')">Change Password</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Two-Factor Authentication
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Enable 2FA</div>
+            <div class="toggle-desc">Add an extra layer of security via SMS or authenticator app.</div>
+          </div>
+          <label class="toggle"><input type="checkbox"/><span class="toggle-track"></span></label>
+        </div>
+      </div>
+
+      <div class="danger-card">
+        <div class="danger-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Danger Zone
+        </div>
+        <div class="danger-row">
+          <div class="danger-info">
+            <div class="danger-lbl">Log Out All Devices</div>
+            <div class="danger-desc">Sign out from all active sessions.</div>
+          </div>
+          <button class="danger-btn" onclick="showToast('Logged out all devices')">Log Out All</button>
+        </div>
+        <div class="danger-row">
+          <div class="danger-info">
+            <div class="danger-lbl">Delete Account</div>
+            <div class="danger-desc">Permanently delete your account and all data. This cannot be undone.</div>
+          </div>
+          <button class="danger-btn" onclick="showToast('Please contact support')">Delete</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ NOTIFICATIONS PANEL ═══ -->
+    <div id="panel-notifications" class="panel">
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          Push Notifications
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Daily Study Reminder</div>
+            <div class="toggle-desc">Get reminded to keep your learning streak going.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Quiz Results</div>
+            <div class="toggle-desc">Notify me when quiz scores are ready.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">New Chapter Available</div>
+            <div class="toggle-desc">Alert me when a new chapter summary drops.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Streak at Risk</div>
+            <div class="toggle-desc">Remind me before my streak is about to reset.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Leaderboard Updates</div>
+            <div class="toggle-desc">Notify me about my rank changes.</div>
+          </div>
+          <label class="toggle"><input type="checkbox"/><span class="toggle-track"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email Notifications
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Weekly Progress Report</div>
+            <div class="toggle-desc">A summary of your study progress every Sunday.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Tips &amp; Study Guides</div>
+            <div class="toggle-desc">Receive curated exam tips from our tutors.</div>
+          </div>
+          <label class="toggle"><input type="checkbox"/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Promotional Offers</div>
+            <div class="toggle-desc">Be the first to know about discounts and new plans.</div>
+          </div>
+          <label class="toggle"><input type="checkbox"/><span class="toggle-track"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Reminder Time
+        </div>
+        <div class="field">
+          <label>Daily reminder at</label>
+          <input type="time" value="18:00" style="max-width:160px"/>
+          <span class="field-hint">We'll ping you at this time every day to study.</span>
+        </div>
+        <div style="margin-top:14px">
+          <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:8px">Reminder days</label>
+          <div class="notif-freq">
+            <button class="freq-chip selected" onclick="toggleChip(this)">Mon</button>
+            <button class="freq-chip selected" onclick="toggleChip(this)">Tue</button>
+            <button class="freq-chip selected" onclick="toggleChip(this)">Wed</button>
+            <button class="freq-chip selected" onclick="toggleChip(this)">Thu</button>
+            <button class="freq-chip selected" onclick="toggleChip(this)">Fri</button>
+            <button class="freq-chip" onclick="toggleChip(this)">Sat</button>
+            <button class="freq-chip" onclick="toggleChip(this)">Sun</button>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="save-btn" onclick="showToast('Notification preferences saved!')">Save Preferences</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ PLAN PANEL ═══ -->
+    <div id="panel-plan" class="panel">
+
+      <!-- Current Plan -->
+      <div class="plan-current">
+        <div class="plan-current-top">
+          <div>
+            <div class="plan-eyebrow">Current Plan</div>
+            <div class="plan-current-name">🎁 Free Starter</div>
+          </div>
+          <div class="plan-pill">Active</div>
+        </div>
+        <div class="plan-current-features">
+          <div class="plan-feat-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            1 Chapter Summary
+          </div>
+          <div class="plan-feat-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            1 Audio Lesson
+          </div>
+          <div class="plan-feat-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            1 CBT Quiz Daily
+          </div>
+          <div class="plan-feat-item">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Basic Dashboard
+          </div>
+        </div>
+        <button class="upgrade-btn" onclick="showToast('Redirecting to plans…')">
+          👑 Upgrade Plan
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- Available Plans -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Upgrade Your Plan
+        </div>
+
+        <!-- Scholar — MOST POPULAR -->
+        <div style="border:1.5px solid #2d5be3;border-radius:12px;padding:16px;margin-bottom:10px;position:relative">
+          <div style="position:absolute;top:-11px;left:16px;background:#2d5be3;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.06em">MOST POPULAR</div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#2d5be3;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">👑 Scholar</div>
+              <div style="font-size:22px;font-weight:800;color:#0f2166;line-height:1">₦500 <span style="font-size:12px;font-weight:400;color:#9ca3af">/ month</span></div>
+              <div style="font-size:11.5px;color:#9ca3af;margin-top:2px">Great for consistent learners.</div>
+            </div>
+            <button class="save-btn" style="padding:8px 14px;font-size:12px;flex-shrink:0" onclick="showToast('Redirecting to payment…')">Choose</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#2d5be3" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>5 Chapter Summaries</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#2d5be3" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>5 Audio Lessons</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#2d5be3" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>5 CBT Quizzes Daily</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#2d5be3" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Progress Tracking &amp; Study Streak</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#2d5be3" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Performance Overview</div>
+          </div>
+        </div>
+
+        <!-- Master — BEST VALUE -->
+        <div style="border:1.5px solid #f59e0b;border-radius:12px;padding:16px;position:relative">
+          <div style="position:absolute;top:-11px;left:16px;background:#f59e0b;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.06em">BEST VALUE</div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#b45309;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">💎 Master</div>
+              <div style="font-size:22px;font-weight:800;color:#0f2166;line-height:1">₦1,500 <span style="font-size:12px;font-weight:400;color:#9ca3af">/ month</span></div>
+              <div style="font-size:11.5px;color:#9ca3af;margin-top:2px">For students who want to excel.</div>
+            </div>
+            <button class="save-btn gold" style="padding:8px 14px;font-size:12px;flex-shrink:0" onclick="showToast('Redirecting to payment…')">Choose</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#f59e0b" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Unlimited Chapter Summaries</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#f59e0b" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Unlimited Audio Lessons</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#f59e0b" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Unlimited CBT Quizzes</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#f59e0b" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>General Novel Challenge</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#f59e0b" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Advanced Analytics &amp; Exam Readiness</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#f59e0b" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Priority Access to New Content</div>
+            <div style="display:flex;align-items:center;gap:7px;font-size:12px;color:#374151"><svg width="13" height="13" fill="none" stroke="#f59e0b" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Complete Learning Experience</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compare Table -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+          Compare Plans
+        </div>
+        <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid #e4e7f0">
+          <table style="width:100%;min-width:360px;border-collapse:collapse;font-size:12px">
+            <thead>
+              <tr style="background:#0f2166;color:#fff">
+                <th style="padding:10px 12px;text-align:left;font-weight:600;font-size:11.5px">Feature</th>
+                <th style="padding:10px 8px;text-align:center;font-weight:600;font-size:11.5px">Free</th>
+                <th style="padding:10px 8px;text-align:center;font-weight:700;font-size:11.5px;color:#93c5fd">Scholar</th>
+                <th style="padding:10px 8px;text-align:center;font-weight:700;font-size:11.5px;color:#fcd34d">Master</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #f3f4f8"><td style="padding:9px 12px;color:#374151;font-weight:500">📖 Chapter Summaries</td><td style="text-align:center;color:#9ca3af">1</td><td style="text-align:center;color:#2d5be3;font-weight:700">5</td><td style="text-align:center;color:#b45309;font-weight:700">Unlimited</td></tr>
+              <tr style="border-bottom:1px solid #f3f4f8;background:#f8f9ff"><td style="padding:9px 12px;color:#374151;font-weight:500">🎧 Audio Lessons</td><td style="text-align:center;color:#9ca3af">1</td><td style="text-align:center;color:#2d5be3;font-weight:700">5</td><td style="text-align:center;color:#b45309;font-weight:700">Unlimited</td></tr>
+              <tr style="border-bottom:1px solid #f3f4f8"><td style="padding:9px 12px;color:#374151;font-weight:500">❓ CBT Quizzes Daily</td><td style="text-align:center;color:#9ca3af">1</td><td style="text-align:center;color:#2d5be3;font-weight:700">5</td><td style="text-align:center;color:#b45309;font-weight:700">Unlimited</td></tr>
+              <tr style="border-bottom:1px solid #f3f4f8;background:#f8f9ff"><td style="padding:9px 12px;color:#374151;font-weight:500">📊 Progress Tracking</td><td style="text-align:center;color:#2d5be3">✓</td><td style="text-align:center;color:#2d5be3">✓</td><td style="text-align:center;color:#f59e0b">✓</td></tr>
+              <tr style="border-bottom:1px solid #f3f4f8"><td style="padding:9px 12px;color:#374151;font-weight:500">📈 Analytics</td><td style="text-align:center;color:#d1d5db">—</td><td style="text-align:center;color:#2d5be3">✓</td><td style="text-align:center;color:#f59e0b">✓</td></tr>
+              <tr style="border-bottom:1px solid #f3f4f8;background:#f8f9ff"><td style="padding:9px 12px;color:#374151;font-weight:500">🏆 Novel Challenge</td><td style="text-align:center;color:#d1d5db">—</td><td style="text-align:center;color:#d1d5db">—</td><td style="text-align:center;color:#f59e0b">✓</td></tr>
+              <tr><td style="padding:9px 12px;color:#374151;font-weight:500">⚡ New Content Access</td><td style="text-align:center;color:#d1d5db">—</td><td style="text-align:center;color:#2d5be3">✓</td><td style="text-align:center;color:#f59e0b">✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Billing Info -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Billing
+        </div>
+        <div class="info-row">
+          <span class="info-lbl">Current Plan</span>
+          <span class="info-val">Free Starter</span>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl">Next Billing Date</span>
+          <span class="info-val">— (No active subscription)</span>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl">Payment Method</span>
+          <button class="info-link">Add Payment Method</button>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl">Billing History</span>
+          <button class="info-link">View Invoices</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ PRIVACY PANEL ═══ -->
+    <div id="panel-privacy" class="panel">
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          Profile Visibility
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Show on Leaderboard</div>
+            <div class="toggle-desc">Let other students see your name and score on rankings.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Public Study Progress</div>
+            <div class="toggle-desc">Allow others to see how many chapters you've completed.</div>
+          </div>
+          <label class="toggle"><input type="checkbox"/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Show Streak to Others</div>
+            <div class="toggle-desc">Display your daily streak badge on your public profile.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Data & Analytics
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Usage Analytics</div>
+            <div class="toggle-desc">Help us improve Zenova by sharing anonymised usage data.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Personalisation</div>
+            <div class="toggle-desc">Let us use your study history to personalise recommendations.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Crash Reports</div>
+            <div class="toggle-desc">Automatically send crash reports to help fix bugs faster.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-track"></span></label>
+        </div>
+        <div style="margin-top:14px">
+          <button class="save-btn" onclick="showToast('Privacy settings saved!')">Save Settings</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Legal &amp; Data Rights
+        </div>
+        <div class="info-row">
+          <span class="info-lbl">Privacy Policy</span>
+          <button class="info-link">Read →</button>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl">Terms of Service</span>
+          <button class="info-link">Read →</button>
+        </div>
+        <div class="info-row">
+          <span class="info-lbl">Download My Data</span>
+          <button class="info-link" onclick="showToast('Your data export has been requested')">Request Export</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- end settings-wrap -->
+</main>
+
+</div><!-- end app -->
+
+<!-- Mobile Nav -->
+<nav class="mobile-nav">
+  <button class="mnav-btn" onclick="location.href='dashboard.html'">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9.75L12 3l9 6.75V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.75z"/><path d="M9 21V12h6v9"/></svg>Home
+  </button>
+  <button class="mnav-btn" onclick="location.href='chapters.html'">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Chapters
+  </button>
+  <button class="mnav-btn" onclick="location.href='practice_question.html'">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none"/></svg>Audio
+  </button>
+  <button class="mnav-btn" onclick="location.href='test1.html'">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>Quiz
+  </button>
+  <button class="mnav-btn active" onclick="setMnav(this)">
+    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings
+  </button>
+</nav>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + id).classList.add('active');
+}
+
+function setSb(btn) {
+  document.querySelectorAll('.sb-btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function setMnav(btn) {
+  document.querySelectorAll('.mnav-btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleChip(chip) {
+  chip.classList.toggle('selected');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✓ ' + msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

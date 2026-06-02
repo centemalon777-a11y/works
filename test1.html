@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Zenova – Test 1: The Lekki Headmaster</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#f0f2f8;color:#1e1e2e}
+
+/* ── INTRO SCREEN ── */
+#introScreen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;background:#f0f2f8}
+.intro-card{background:#fff;border-radius:22px;border:1px solid #e4e7f0;padding:32px 24px;max-width:480px;width:100%;box-shadow:0 8px 40px rgba(15,33,102,.08)}
+.intro-badge{display:inline-flex;align-items:center;gap:6px;background:#e0e7ff;border-radius:99px;padding:6px 14px;font-size:12px;font-weight:700;color:#0f2166;margin-bottom:18px}
+.intro-title{font-size:24px;font-weight:800;color:#0f2166;letter-spacing:-0.5px;margin-bottom:6px}
+.intro-sub{font-size:13.5px;color:#6b7280;line-height:1.6;margin-bottom:22px}
+.intro-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.intro-stat{background:#f8f9fd;border-radius:12px;padding:14px 10px;text-align:center;border:1px solid #e4e7f0}
+.intro-stat-val{font-size:22px;font-weight:800;color:#0f2166;line-height:1}
+.intro-stat-lbl{font-size:10.5px;color:#9ca3af;margin-top:4px;font-weight:500}
+.intro-rules{background:#fef9c3;border:1.5px solid #fde68a;border-radius:12px;padding:14px 16px;margin-bottom:24px}
+.intro-rules-title{font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.intro-rules ul{padding-left:16px;display:flex;flex-direction:column;gap:5px}
+.intro-rules li{font-size:12.5px;color:#78350f;line-height:1.5}
+.start-btn{width:100%;padding:15px;background:linear-gradient(135deg,#0f2166,#1e3a9f);border:none;border-radius:12px;font-family:'Inter',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s}
+.start-btn:hover{opacity:.9}
+
+/* ── QUIZ SCREEN ── */
+#quizScreen{display:none;min-height:100vh;flex-direction:column}
+
+/* Top Bar */
+.quiz-topbar{background:#fff;border-bottom:1px solid #e4e7f0;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.quit-btn{background:none;border:1.5px solid #e4e7f0;border-radius:8px;padding:6px 11px;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:#6b7280;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s}
+.quit-btn:hover{border-color:#ef4444;color:#ef4444}
+.topbar-title{font-size:13.5px;font-weight:700;color:#0f2166}
+.topbar-sub{font-size:11px;color:#9ca3af;margin-top:1px}
+
+/* Timer */
+.timer-wrap{display:flex;align-items:center;gap:7px;background:#f8f9fd;border:1.5px solid #e4e7f0;border-radius:10px;padding:7px 13px}
+.timer-wrap.warning{background:#fff7ed;border-color:#fed7aa}
+.timer-wrap.danger{background:#fef2f2;border-color:#fca5a5;animation:pulse .8s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.timer-icon{font-size:15px}
+.timer-val{font-size:14px;font-weight:800;color:#0f2166;font-variant-numeric:tabular-nums}
+.timer-wrap.warning .timer-val{color:#d97706}
+.timer-wrap.danger .timer-val{color:#dc2626}
+
+/* Progress bar */
+.quiz-progress-bar{height:4px;background:#e8eaf2;flex-shrink:0}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,#0f2166,#1e3a9f);border-radius:0 99px 99px 0;transition:width .4s ease}
+
+/* Question nav dots */
+.q-dots-wrap{background:#fff;border-bottom:1px solid #f0f2f8;padding:10px 16px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.q-dots-wrap::-webkit-scrollbar{display:none}
+.q-dots{display:flex;gap:6px;width:max-content}
+.q-dot{width:28px;height:28px;border-radius:8px;border:1.5px solid #e4e7f0;background:#fff;font-size:11px;font-weight:700;color:#9ca3af;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.q-dot.answered{background:#dcfce7;border-color:#16a34a;color:#16a34a}
+.q-dot.current{background:#0f2166;border-color:#0f2166;color:#fff}
+.q-dot.answered.current{background:#0f2166;border-color:#0f2166;color:#fff}
+
+/* Question area */
+.quiz-body{flex:1;padding:20px 16px 100px;display:flex;flex-direction:column;gap:0;overflow-y:auto}
+
+.q-counter{font-size:11.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.q-question{font-size:16px;font-weight:700;color:#0f2166;line-height:1.55;margin-bottom:20px}
+.options-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+
+.option-btn{background:#fff;border:1.5px solid #e4e7f0;border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:all .18s;text-align:left;width:100%;font-family:'Inter',sans-serif}
+.option-btn:hover:not(.selected):not(.correct):not(.wrong){border-color:#0f2166;background:#f5f7ff}
+.option-btn.selected{border-color:#0f2166;background:#e0e7ff}
+.option-btn.correct{border-color:#16a34a;background:#dcfce7;cursor:default}
+.option-btn.wrong{border-color:#dc2626;background:#fef2f2;cursor:default}
+.option-btn.reveal-correct{border-color:#16a34a;background:#dcfce7;cursor:default}
+
+.opt-letter{width:30px;height:30px;border-radius:8px;background:#f0f2f8;border:1.5px solid #e4e7f0;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;color:#6b7280;flex-shrink:0;transition:all .18s}
+.option-btn.selected .opt-letter{background:#0f2166;border-color:#0f2166;color:#fff}
+.option-btn.correct .opt-letter{background:#16a34a;border-color:#16a34a;color:#fff}
+.option-btn.wrong .opt-letter{background:#dc2626;border-color:#dc2626;color:#fff}
+.option-btn.reveal-correct .opt-letter{background:#16a34a;border-color:#16a34a;color:#fff}
+
+.opt-text{font-size:13.5px;font-weight:500;color:#374151;flex:1;line-height:1.45}
+.option-btn.correct .opt-text,.option-btn.reveal-correct .opt-text{color:#14532d;font-weight:600}
+.option-btn.wrong .opt-text{color:#991b1b;font-weight:600}
+
+/* Explanation box */
+.explanation{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:13px 15px;margin-bottom:20px;display:none;animation:fadeIn .25s ease}
+.explanation.show{display:block}
+.explanation.wrong-exp{background:#fff7ed;border-color:#fed7aa}
+.exp-label{font-size:10.5px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.explanation.wrong-exp .exp-label{color:#d97706}
+.exp-text{font-size:13px;color:#14532d;line-height:1.6}
+.explanation.wrong-exp .exp-text{color:#92400e}
+
+/* Bottom nav */
+.quiz-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:#fff;border-top:1px solid #e4e7f0;position:fixed;bottom:0;left:0;right:0;z-index:100}
+.nav-prev,.nav-next{display:flex;align-items:center;gap:6px;padding:11px 20px;border-radius:11px;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;border:none;transition:all .18s}
+.nav-prev{background:#f0f2f8;color:#6b7280}
+.nav-prev:hover:not(:disabled){background:#e4e7f0;color:#0f2166}
+.nav-prev:disabled{opacity:.4;cursor:default}
+.nav-next{background:#0f2166;color:#fff;flex:1;justify-content:center}
+.nav-next:hover{opacity:.9}
+.nav-next.submit-btn{background:linear-gradient(135deg,#16a34a,#15803d)}
+.q-nav-count{font-size:12.5px;font-weight:700;color:#9ca3af;white-space:nowrap}
+
+/* ── RESULT SCREEN ── */
+#resultScreen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px;background:#f0f2f8;overflow-y:auto}
+.result-card{background:#fff;border-radius:22px;border:1px solid #e4e7f0;padding:28px 24px;max-width:520px;width:100%;box-shadow:0 8px 40px rgba(15,33,102,.08);margin-bottom:16px}
+.result-hero{background:linear-gradient(135deg,#0f2166,#1e3a9f);border-radius:16px;padding:26px 22px;text-align:center;margin-bottom:22px;position:relative;overflow:hidden}
+.result-hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
+.result-emoji{font-size:48px;margin-bottom:10px;position:relative;z-index:1}
+.result-score-label{font-size:12px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px;position:relative;z-index:1}
+.result-score{font-size:56px;font-weight:800;color:#fff;line-height:1;position:relative;z-index:1}
+.result-pct{font-size:24px;font-weight:800;color:rgba(255,255,255,.7);position:relative;z-index:1}
+.result-grade-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 14px;font-size:12.5px;font-weight:700;color:#fff;margin-top:12px;position:relative;z-index:1}
+
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.rs-item{background:#f8f9fd;border-radius:12px;padding:14px 10px;text-align:center;border:1px solid #e4e7f0}
+.rs-val{font-size:22px;font-weight:800;color:#0f2166}
+.rs-lbl{font-size:10.5px;color:#9ca3af;margin-top:3px;font-weight:500}
+
+.result-actions{display:flex;flex-direction:column;gap:10px}
+.action-btn{width:100%;padding:13px;border-radius:12px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s}
+.action-btn.primary{background:linear-gradient(135deg,#0f2166,#1e3a9f);color:#fff}
+.action-btn.secondary{background:#f0f2f8;color:#0f2166;border:1.5px solid #e4e7f0}
+.action-btn:hover{opacity:.88}
+
+/* Review list */
+.review-card{background:#fff;border-radius:18px;border:1px solid #e4e7f0;padding:20px;max-width:520px;width:100%;margin-bottom:16px}
+.review-title{font-size:15px;font-weight:800;color:#0f2166;margin-bottom:14px}
+.review-item{padding:12px 0;border-bottom:1px solid #f3f4f8}
+.review-item:last-child{border-bottom:none;padding-bottom:0}
+.review-q-num{font-size:10.5px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.review-q-text{font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;line-height:1.45}
+.review-answer-row{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;font-weight:500;margin-bottom:2px}
+.review-answer-row.correct-row{color:#16a34a}
+.review-answer-row.wrong-row{color:#dc2626}
+.review-answer-row.correct-ans{color:#16a34a}
+
+/* Timeout overlay */
+#timeoutOverlay{display:none;position:fixed;inset:0;background:rgba(15,21,50,.7);z-index:500;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+#timeoutOverlay.show{display:flex}
+.timeout-card{background:#fff;border-radius:20px;padding:32px 24px;max-width:360px;width:100%;text-align:center}
+.timeout-emoji{font-size:48px;margin-bottom:12px}
+.timeout-title{font-size:20px;font-weight:800;color:#0f2166;margin-bottom:6px}
+.timeout-sub{font-size:13.5px;color:#6b7280;line-height:1.6;margin-bottom:22px}
+
+/* Quit confirm */
+#quitOverlay{display:none;position:fixed;inset:0;background:rgba(15,21,50,.7);z-index:500;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px)}
+#quitOverlay.show{display:flex}
+.quit-card{background:#fff;border-radius:20px;padding:28px 24px;max-width:340px;width:100%;text-align:center}
+.quit-card h3{font-size:18px;font-weight:800;color:#0f2166;margin-bottom:8px}
+.quit-card p{font-size:13px;color:#6b7280;line-height:1.6;margin-bottom:20px}
+.quit-actions{display:flex;gap:10px}
+.quit-actions button{flex:1;padding:12px;border-radius:10px;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:700;cursor:pointer;border:none}
+.quit-stay{background:#f0f2f8;color:#0f2166}
+.quit-leave{background:#ef4444;color:#fff}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+@media(min-width:600px){
+  .quiz-body{padding:28px 28px 100px}
+  .q-question{font-size:17px}
+  .result-card,.review-card{margin-left:auto;margin-right:auto}
+  #resultScreen{padding:32px 24px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ INTRO SCREEN ══════════════ -->
+<div id="introScreen">
+  <div class="intro-card">
+    <div class="intro-badge">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12l2 2 4-4"/></svg>
+      CBT Practice · Test 1
+    </div>
+    <h1 class="intro-title">The Lekki Headmaster</h1>
+    <p class="intro-sub">Test your understanding of Chapters 1 &amp; 2. Questions are in JAMB CBT style — pick the best answer for each.</p>
+
+    <div class="intro-stats">
+      <div class="intro-stat">
+        <div class="intro-stat-val">20</div>
+        <div class="intro-stat-lbl">Questions</div>
+      </div>
+      <div class="intro-stat">
+        <div class="intro-stat-val">10</div>
+        <div class="intro-stat-lbl">Minutes</div>
+      </div>
+      <div class="intro-stat">
+        <div class="intro-stat-val">5</div>
+        <div class="intro-stat-lbl">Marks Each</div>
+      </div>
+    </div>
+
+    <div class="intro-rules">
+      <div class="intro-rules-title">📋 Instructions</div>
+      <ul>
+        <li>Select one answer per question.</li>
+        <li>You can review your answers before submitting.</li>
+        <li>The timer starts immediately. Do not leave the page.</li>
+        <li>Correct answers are shown after you submit or time runs out.</li>
+      </ul>
+    </div>
+
+    <button class="start-btn" onclick="startQuiz()">
+      Start Test
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ QUIZ SCREEN ══════════════ -->
+<div id="quizScreen">
+
+  <!-- Top Bar -->
+  <div class="quiz-topbar">
+    <div class="topbar-left">
+      <button class="quit-btn" onclick="confirmQuit()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Quit
+      </button>
+      <div>
+        <div class="topbar-title">Test 1 – Chapters 1 &amp; 2</div>
+        <div class="topbar-sub">The Lekki Headmaster</div>
+      </div>
+    </div>
+    <div class="timer-wrap" id="timerWrap">
+      <span class="timer-icon">⏱️</span>
+      <span class="timer-val" id="timerVal">10:00</span>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="quiz-progress-bar">
+    <div class="quiz-progress-fill" id="progressFill" style="width:5%"></div>
+  </div>
+
+  <!-- Question dots -->
+  <div class="q-dots-wrap">
+    <div class="q-dots" id="qDots"></div>
+  </div>
+
+  <!-- Body -->
+  <div class="quiz-body" id="quizBody">
+    <div class="q-counter" id="qCounter">Question 1 of 20</div>
+    <div class="q-question" id="qQuestion"></div>
+    <div class="options-list" id="optionsList"></div>
+    <div class="explanation" id="explanation">
+      <div class="exp-label" id="expLabel">✅ Correct!</div>
+      <div class="exp-text" id="expText"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="quiz-nav">
+    <button class="nav-prev" id="prevBtn" onclick="goTo(currentQ - 1)" disabled>
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Prev
+    </button>
+    <span class="q-nav-count" id="navCount">1 / 20</span>
+    <button class="nav-next" id="nextBtn" onclick="handleNext()">
+      Next
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════ RESULT SCREEN ══════════════ -->
+<div id="resultScreen">
+  <div class="result-card">
+    <div class="result-hero">
+      <div class="result-emoji" id="resultEmoji">🎉</div>
+      <div class="result-score-label">Your Score</div>
+      <div style="display:flex;align-items:flex-end;justify-content:center;gap:4px;position:relative;z-index:1">
+        <div class="result-score" id="resultScore">0</div>
+        <div class="result-pct">/ 100</div>
+      </div>
+      <div class="result-grade-pill" id="resultGrade">Grade: —</div>
+    </div>
+
+    <div class="result-stats">
+      <div class="rs-item">
+        <div class="rs-val" id="rsCorrect">0</div>
+        <div class="rs-lbl">Correct</div>
+      </div>
+      <div class="rs-item">
+        <div class="rs-val" id="rsWrong">0</div>
+        <div class="rs-lbl">Wrong</div>
+      </div>
+      <div class="rs-item">
+        <div class="rs-val" id="rsTime">—</div>
+        <div class="rs-lbl">Time Used</div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="action-btn primary" onclick="showReview()">
+        📋 Review Answers
+      </button>
+      <button class="action-btn secondary" onclick="retakeTest()">
+        🔄 Retake Test
+      </button>
+      <button class="action-btn secondary" onclick="goHome()">
+        ← Back to Quiz List
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ TIMEOUT OVERLAY ══════════════ -->
+<div id="timeoutOverlay">
+  <div class="timeout-card">
+    <div class="timeout-emoji">⏰</div>
+    <h2 class="timeout-title">Time's Up!</h2>
+    <p class="timeout-sub">Your 10 minutes are over. Your answers have been automatically submitted. Let's see how you did!</p>
+    <button class="start-btn" onclick="submitTest(true)">See My Results →</button>
+  </div>
+</div>
+
+<!-- ══════════════ QUIT OVERLAY ══════════════ -->
+<div id="quitOverlay">
+  <div class="quit-card">
+    <h3>Quit Test?</h3>
+    <p>Your progress will be lost. Are you sure you want to leave this test?</p>
+    <div class="quit-actions">
+      <button class="quit-stay" onclick="document.getElementById('quitOverlay').classList.remove('show')">Stay</button>
+      <button class="quit-leave" onclick="goHome()">Quit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   QUESTIONS — 20 questions on Chapters 1 & 2
+   of "The Lekki Headmaster" (JAMB novel)
+═══════════════════════════════════════ */
+const questions = [
+  {
+    q: "What is the full name of the school where the story is set?",
+    opts: ["Lekki Community Grammar School", "Graceland High School Lekki", "Sunshine Secondary School", "Atlantic International School"],
+    ans: 1,
+    exp: "The story is set in Graceland High School Lekki, a school known for its academic excellence and discipline."
+  },
+  {
+    q: "What shocking event happened during the morning assembly in Chapter 1?",
+    opts: ["A student collapsed and fainted", "The principal, Mr. Bepo, broke down emotionally", "A fire broke out near the assembly ground", "A pupil was caught stealing exam papers"],
+    ans: 1,
+    exp: "In Chapter 1, Mr. Bepo, the respected principal, suffered an unexpected emotional breakdown during morning assembly, causing shock throughout the school."
+  },
+  {
+    q: "What percentage success rate did Graceland High School record in WASSCE?",
+    opts: ["75%", "85%", "90%", "95%"],
+    ans: 2,
+    exp: "The school recorded an impressive 90% success rate in WASSCE, which was a source of pride for the school community."
+  },
+  {
+    q: "Who is the Managing Director (MD) of Graceland High School?",
+    opts: ["Mrs. Adeyemi", "Mr. Bepo", "Mrs. Okonkwo", "Mr. Fashola"],
+    ans: 0,
+    exp: "Mrs. Adeyemi is the Managing Director of Graceland High School. She oversees the administration and was informed about Mr. Bepo's breakdown."
+  },
+  {
+    q: "What was the main reason the MD returned to school immediately on hearing the news?",
+    opts: ["A student had run away from school", "She forgot an important document", "She was informed about Mr. Bepo's emotional breakdown during assembly", "There was an inspection by the Ministry of Education"],
+    ans: 2,
+    exp: "The MD rushed back to school because she was urgently informed about Mr. Bepo's emotional breakdown during morning assembly."
+  },
+  {
+    q: "Which student delivered a speech about Jos during the assembly?",
+    opts: ["Chinedu Obi", "Ikenna Egbu", "Tunde Bello", "Amaka Nwosu"],
+    ans: 1,
+    exp: "Ikenna Egbu, an SSS1 student, was the one who delivered a speech about Jos during the morning assembly."
+  },
+  {
+    q: "What class was Ikenna Egbu in when he delivered his speech?",
+    opts: ["JSS 3", "SSS 1", "SSS 2", "SSS 3"],
+    ans: 1,
+    exp: "Ikenna Egbu was an SSS1 student at the time he delivered his speech about Jos during assembly."
+  },
+  {
+    q: "What fee was reduced from ₦250,000 to ₦165,000 at Graceland High School?",
+    opts: ["School development levy", "Tuition fees", "Boarding fees for students", "Lab and ICT fees"],
+    ans: 2,
+    exp: "The boarding fees for students were reduced from ₦250,000 to ₦165,000, reflecting the school management's consideration for parents."
+  },
+  {
+    q: "What is Mr. Bepo's role at Graceland High School?",
+    opts: ["Bursar", "Head of Department", "Principal / Headmaster", "Sports Director"],
+    ans: 2,
+    exp: "Mr. Bepo is the Principal (Headmaster) of Graceland High School — the central figure whose emotional collapse drives the story's opening conflict."
+  },
+  {
+    q: "How did the school community react to Mr. Bepo's breakdown during assembly?",
+    opts: ["They laughed and ignored him", "They were shocked and concerned", "They were angry with him", "They continued the assembly as normal"],
+    ans: 1,
+    exp: "The entire school community — staff and students alike — were shocked and deeply concerned by Mr. Bepo's unexpected emotional breakdown."
+  },
+  {
+    q: "What reputation did Graceland High School have before Chapter 1's events?",
+    opts: ["A school known for frequent student protests", "A poorly-managed school with low pass rates", "A school celebrated for academic excellence and discipline", "A school recently established with no track record"],
+    ans: 2,
+    exp: "Graceland High School was celebrated for its academic excellence and strong discipline, which made Mr. Bepo's public breakdown even more shocking."
+  },
+  {
+    q: "At the start of Chapter 2, what is the primary concern of the school's management regarding Mr. Bepo?",
+    opts: ["His refusal to attend a staff meeting", "His emotional state and fitness to continue leading the school", "His dispute over salary increase", "His alleged favouritism towards certain students"],
+    ans: 1,
+    exp: "Chapter 2 focuses on the management's deep concern about Mr. Bepo's emotional state and whether he remains fit to continue in his role as Headmaster."
+  },
+  {
+    q: "What tone best describes the atmosphere in the school after Mr. Bepo's breakdown?",
+    opts: ["Celebratory and excited", "Tense, anxious, and full of whispers", "Calm and unaffected", "Angry and rebellious"],
+    ans: 1,
+    exp: "After the breakdown, the atmosphere in Graceland High became tense and anxious, with hushed conversations and speculation about what had happened to Mr. Bepo."
+  },
+  {
+    q: "What does Mr. Bepo's breakdown suggest about the pressures faced by school leaders in the novel?",
+    opts: ["That leadership comes with no challenges", "That academic success eliminates personal struggles", "That the weight of leadership can take a severe emotional toll", "That strict discipline prevents emotional breakdowns"],
+    ans: 2,
+    exp: "Mr. Bepo's breakdown is symbolic — it highlights that even respected, outwardly successful leaders carry enormous emotional burdens that can eventually become overwhelming."
+  },
+  {
+    q: "What literary device is primarily used in Chapter 1 when Mr. Bepo collapses during assembly in front of the students?",
+    opts: ["Flashback", "In medias res (beginning in the middle of action)", "Foreshadowing through symbolism", "Soliloquy"],
+    ans: 1,
+    exp: "The novel opens in medias res — the reader is thrown straight into the dramatic event of Mr. Bepo's breakdown, immediately creating tension and drawing the reader in."
+  },
+  {
+    q: "Which of the following best describes Mr. Bepo's character as presented in Chapters 1 and 2?",
+    opts: ["A corrupt and dishonest headmaster who abuses power", "A respected but emotionally vulnerable school leader", "A young and inexperienced teacher thrust into leadership", "A strict disciplinarian who is universally disliked"],
+    ans: 1,
+    exp: "Mr. Bepo is portrayed as a respected and capable headmaster, but the early chapters reveal an emotional vulnerability beneath his authoritative exterior."
+  },
+  {
+    q: "What is the significance of Graceland High School being located in Lekki?",
+    opts: ["It is an isolated rural school with no exposure", "It places the school in an affluent, high-expectation Lagos setting, adding social pressure", "Lekki is mentioned only as a geographical marker with no significance", "It means the school is government-owned"],
+    ans: 1,
+    exp: "Being in Lekki — an upscale Lagos suburb — places the school in a high-expectation social environment where reputation, prestige and performance carry enormous weight."
+  },
+  {
+    q: "What do the opening chapters suggest will be a central conflict in the novel?",
+    opts: ["A rivalry between two schools", "The fight to maintain the reputation and stability of Graceland High after Mr. Bepo's breakdown", "A student's struggle to pass JAMB examinations", "A conflict between teachers and the government"],
+    ans: 1,
+    exp: "The opening chapters set up the central conflict: Can Graceland High maintain its status, discipline and excellence in the wake of its headmaster's shocking public collapse?"
+  },
+  {
+    q: "How does the author use the morning assembly in Chapter 1 as a narrative setting?",
+    opts: ["As a private scene between two characters", "As a very public space that amplifies the impact of Mr. Bepo's breakdown before the entire school community", "To show the students' lack of discipline", "As an irrelevant background detail"],
+    ans: 1,
+    exp: "The morning assembly is a deliberately public setting — it ensures the entire school witnesses Mr. Bepo's breakdown, maximising its dramatic and social impact on the story."
+  },
+  {
+    q: "Based on Chapters 1 and 2, which theme is MOST prominent in the opening of 'The Lekki Headmaster'?",
+    opts: ["Romantic love between characters", "The fragility of leadership and public image under pressure", "National politics and government corruption", "Peer pressure among secondary school students"],
+    ans: 1,
+    exp: "The most prominent theme in the opening chapters is the fragility of leadership — showing that even a celebrated, powerful school leader can be broken by unseen internal pressures."
+  }
+];
+
+/* ═══════ STATE ═══════ */
+let currentQ = 0;
+let userAnswers = new Array(questions.length).fill(-1);
+let answered = new Array(questions.length).fill(false);
+let timerInterval = null;
+let secondsLeft = 600; // 10 minutes
+let startTime = null;
+let submitted = false;
+let timeUsed = 0;
+
+/* ═══════ START ═══════ */
+function startQuiz() {
+  document.getElementById('introScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'flex';
+  document.getElementById('quizScreen').style.flexDirection = 'column';
+
+  buildDots();
+  renderQuestion(0);
+  startTimer();
+  startTime = Date.now();
+}
+
+/* ═══════ TIMER ═══════ */
+function startTimer() {
+  timerInterval = setInterval(() => {
+    secondsLeft--;
+    updateTimerDisplay();
+    if (secondsLeft <= 0) {
+      clearInterval(timerInterval);
+      timeoutTest();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(secondsLeft / 60);
+  const s = secondsLeft % 60;
+  document.getElementById('timerVal').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+  const wrap = document.getElementById('timerWrap');
+  wrap.classList.remove('warning', 'danger');
+  if (secondsLeft <= 60) wrap.classList.add('danger');
+  else if (secondsLeft <= 180) wrap.classList.add('warning');
+}
+
+function timeoutTest() {
+  document.getElementById('timeoutOverlay').classList.add('show');
+}
+
+/* ═══════ DOTS ═══════ */
+function buildDots() {
+  const container = document.getElementById('qDots');
+  container.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'q-dot' + (i === 0 ? ' current' : '');
+    d.textContent = i + 1;
+    d.setAttribute('aria-label', `Go to question ${i + 1}`);
+    d.onclick = () => goTo(i);
+    container.appendChild(d);
+  });
+}
+
+function updateDots() {
+  document.querySelectorAll('.q-dot').forEach((d, i) => {
+    d.className = 'q-dot';
+    if (userAnswers[i] !== -1) d.classList.add('answered');
+    if (i === currentQ) d.classList.add('current');
+  });
+  // scroll active dot into view
+  const dots = document.querySelectorAll('.q-dot');
+  if (dots[currentQ]) dots[currentQ].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+
+/* ═══════ RENDER QUESTION ═══════ */
+function renderQuestion(idx) {
+  currentQ = idx;
+  const q = questions[idx];
+
+  document.getElementById('qCounter').textContent = `Question ${idx + 1} of ${questions.length}`;
+  document.getElementById('qQuestion').textContent = q.q;
+  document.getElementById('navCount').textContent = `${idx + 1} / ${questions.length}`;
+
+  // Progress bar
+  document.getElementById('progressFill').style.width = `${((idx + 1) / questions.length) * 100}%`;
+
+  // Options
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+
+    let cls = '';
+    if (answered[idx]) {
+      if (i === q.ans) cls = ' correct';
+      else if (i === userAnswers[idx] && userAnswers[idx] !== q.ans) cls = ' wrong';
+      else if (i === userAnswers[idx] && userAnswers[idx] === q.ans) cls = ' correct';
+    } else {
+      if (i === userAnswers[idx]) cls = ' selected';
+    }
+
+    btn.className = 'option-btn' + cls;
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span><span class="opt-text">${opt}</span>`;
+
+    if (!answered[idx]) {
+      btn.onclick = () => selectAnswer(idx, i);
+    }
+
+    list.appendChild(btn);
+  });
+
+  // Explanation
+  const expBox = document.getElementById('explanation');
+  expBox.classList.remove('show', 'wrong-exp');
+  if (answered[idx]) {
+    const correct = userAnswers[idx] === q.ans;
+    expBox.classList.add('show');
+    if (!correct) expBox.classList.add('wrong-exp');
+    document.getElementById('expLabel').textContent = correct ? '✅ Correct!' : '❌ Incorrect';
+    document.getElementById('expText').textContent = q.exp;
+  }
+
+  // Prev / Next
+  document.getElementById('prevBtn').disabled = idx === 0;
+
+  const nextBtn = document.getElementById('nextBtn');
+  const allAnswered = userAnswers.every(a => a !== -1);
+  if (idx === questions.length - 1) {
+    nextBtn.textContent = '';
+    nextBtn.innerHTML = allAnswered
+      ? '🏁 Submit Test'
+      : `Skip & Submit`;
+    nextBtn.className = 'nav-next submit-btn';
+  } else {
+    nextBtn.innerHTML = `Next <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+    nextBtn.className = 'nav-next';
+  }
+
+  updateDots();
+
+  // Scroll body to top
+  document.getElementById('quizBody').scrollTop = 0;
+}
+
+/* ═══════ SELECT ANSWER ═══════ */
+function selectAnswer(qIdx, optIdx) {
+  if (answered[qIdx]) return;
+  userAnswers[qIdx] = optIdx;
+  answered[qIdx] = true;
+  renderQuestion(qIdx);
+}
+
+/* ═══════ NAVIGATION ═══════ */
+function goTo(idx) {
+  if (idx < 0 || idx >= questions.length) return;
+  renderQuestion(idx);
+}
+
+function handleNext() {
+  if (currentQ === questions.length - 1) {
+    submitTest(false);
+  } else {
+    goTo(currentQ + 1);
+  }
+}
+
+/* ═══════ SUBMIT ═══════ */
+function submitTest(fromTimeout) {
+  if (submitted) return;
+  submitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('timeoutOverlay').classList.remove('show');
+
+  timeUsed = Math.round((Date.now() - startTime) / 1000);
+
+  // Calculate score
+  let correct = 0;
+  questions.forEach((q, i) => {
+    if (userAnswers[i] === q.ans) correct++;
+  });
+  const score = Math.round((correct / questions.length) * 100);
+  const wrong = questions.length - correct;
+  const skipped = userAnswers.filter(a => a === -1).length;
+
+  // Grade
+  let grade, emoji;
+  if (score >= 80) { grade = 'Distinction 🏆'; emoji = '🏆'; }
+  else if (score >= 60) { grade = 'Credit 🎖️'; emoji = '🎉'; }
+  else if (score >= 50) { grade = 'Pass ✅'; emoji = '👍'; }
+  else { grade = 'Fail — Try Again'; emoji = '😔'; }
+
+  // Format time used
+  const tm = Math.floor(timeUsed / 60);
+  const ts = timeUsed % 60;
+  const timeStr = `${tm}:${ts < 10 ? '0' : ''}${ts}`;
+
+  // Show result screen
+  document.getElementById('quizScreen').style.display = 'none';
+  const rs = document.getElementById('resultScreen');
+  rs.style.display = 'flex';
+  rs.style.flexDirection = 'column';
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultGrade').textContent = `Grade: ${grade}`;
+  document.getElementById('rsCorrect').textContent = correct;
+  document.getElementById('rsWrong').textContent = wrong + (skipped > 0 ? ` (+${skipped} skipped)` : '');
+  document.getElementById('rsTime').textContent = timeStr;
+}
+
+/* ═══════ REVIEW ═══════ */
+function showReview() {
+  // Remove any existing review card
+  const old = document.getElementById('reviewCardEl');
+  if (old) old.remove();
+
+  const card = document.createElement('div');
+  card.className = 'review-card';
+  card.id = 'reviewCardEl';
+
+  let html = '<div class="review-title">📋 Detailed Review</div>';
+
+  questions.forEach((q, i) => {
+    const userAns = userAnswers[i];
+    const correct = userAns === q.ans;
+    const letters = ['A', 'B', 'C', 'D'];
+
+    html += `<div class="review-item">
+      <div class="review-q-num">Q${i + 1}</div>
+      <div class="review-q-text">${q.q}</div>`;
+
+    if (userAns !== -1) {
+      html += `<div class="review-answer-row ${correct ? 'correct-row' : 'wrong-row'}">
+        ${correct ? '✅' : '❌'} Your answer: ${letters[userAns]}. ${q.opts[userAns]}
+      </div>`;
+    } else {
+      html += `<div class="review-answer-row wrong-row">⚪ Not answered</div>`;
+    }
+
+    if (!correct) {
+      html += `<div class="review-answer-row correct-ans">✅ Correct: ${letters[q.ans]}. ${q.opts[q.ans]}</div>`;
+    }
+
+    html += `<div style="font-size:12px;color:#6b7280;margin-top:4px;line-height:1.5">${q.exp}</div>`;
+    html += `</div>`;
+  });
+
+  card.innerHTML = html;
+  document.getElementById('resultScreen').appendChild(card);
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ═══════ MISC ═══════ */
+function confirmQuit() {
+  document.getElementById('quitOverlay').classList.add('show');
+}
+
+function retakeTest() {
+  // Full reset
+  currentQ = 0;
+  userAnswers = new Array(questions.length).fill(-1);
+  answered = new Array(questions.length).fill(false);
+  secondsLeft = 600;
+  submitted = false;
+  timeUsed = 0;
+  document.getElementById('resultScreen').style.display = 'none';
+  const old = document.getElementById('reviewCardEl');
+  if (old) old.remove();
+  document.getElementById('introScreen').style.display = 'flex';
+  document.getElementById('introScreen').style.alignItems = 'center';
+  document.getElementById('introScreen').style.justifyContent = 'center';
+}
+
+function goHome() {
+  window.location.href = 'dashboard.html';
+}
+</script>
+</body>
+</html>
